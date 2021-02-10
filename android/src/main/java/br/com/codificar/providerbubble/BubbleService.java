@@ -1,7 +1,7 @@
-package providerbubble;
+package br.com.codificar.providerbubble;
 
-import providerbubble.R;
-import providerbubble.MainActivity;
+import br.com.codificar.providerbubble.R;
+import br.com.codificar.providerbubble.MainActivity;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -36,11 +36,11 @@ import android.net.Uri;
 import android.media.MediaPlayer;
 
 public class BubbleService extends Service {
-    public static final String APP_NAME = "Prestação de Serviços";
+    public static final String APP_NAME = "Prestação de Serviços"; // TODO isso deve vir externo
     public static final String REACT_CLASS = "BubbleService";
     private NotificationManager mNotificationManager;
 
-    public static final String FOREGROUND = "providerbubble.BubbleService";
+    public static final String FOREGROUND = "br.com.codificar.providerbubble.BubbleService";
     private static int NOTIFICATION_ID = 3313;
 	  private static int PERMISSION_OVERLAY_SCREEN = 78;
     private WindowManager windowManager;
@@ -346,8 +346,6 @@ public class BubbleService extends Service {
                 return true;
             }
         });
-
-
 
         WindowManager.LayoutParams paramsTxt = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,

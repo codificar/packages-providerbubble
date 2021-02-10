@@ -119,8 +119,20 @@ index.js
 
 ## 3. Migrando o seu código para estrutura de um pacote.
 
+Caso o código já exista é possível criar um pacote para ele, para isso seguiremos certos passos que serão narrados aqui.
 ### 3.1. Primeiros Passos
 
+- Criar um projeto com o comando acima;
+- Para a estrutura criada copiaremos o código android, em main, java , etc ...
+  - Copiar o Package, Module e Manager já existentes
+  - Renomear as classes desses arquivos acima;
+  - Renomear o pacote desses arquivos acima;
+  - Refatorar trocando todos os locais que refira aos nomes antigos;
+  - Copiar outros arquivos java que possam estar sendo utilizados;
+- Para o index.js você usar o arquivo que funcionava de bridge no seu projeto;
+  - Copie as copie as funções para index.js;
+  - Renomear o nome do NativeModules para o nome novo gerado pelo pacote npm que usamos que cria;
+  - Refatorar as referências antigas para os nomes novos ;
 ### 3.2. Dificuldades
 
 ### 3.3. Dicas

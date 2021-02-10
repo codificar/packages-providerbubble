@@ -1,4 +1,4 @@
-package providerbubble;
+package br.com.codificar.providerbubble;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
@@ -16,7 +16,6 @@ public class RNProviderBubblePackage implements ReactPackage {
       return Arrays.<NativeModule>asList(new RNProviderBubbleModule(reactContext));
     }
 
-    // Deprecated from RN 0.47
     public List<Class<? extends JavaScriptModule>> createJSModules() {
       return Collections.emptyList();
     }

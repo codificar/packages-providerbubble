@@ -1,5 +1,5 @@
 
-package providerbubble;
+package br.com.codificar.providerbubble;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -39,8 +39,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import providerbubble.BubbleService;
-import providerbubble.RedisHandler;
+import br.com.codificar.providerbubble.BubbleService;
+import br.com.codificar.providerbubble.RedisHandler;
 
 
 public class RNProviderBubbleModule extends ReactContextBaseJavaModule implements LifecycleEventListener, AsyncTaskCompleteListener {

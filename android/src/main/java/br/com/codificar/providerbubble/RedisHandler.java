@@ -1,4 +1,4 @@
-package providerbubble;
+package br.com.codificar.providerbubble;
 
 import android.util.Log;
 
@@ -8,7 +8,7 @@ import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.pubsub.RedisPubSubAdapter;
 import com.lambdaworks.redis.pubsub.RedisPubSubConnection;
 
-import providerbubble.BubbleServiceBridgeModule;
+import br.com.codificar.providerbubble.BubbleServiceBridgeModule;
 
 /**
  * A handler to a Redis PubSub client. Can handle multiple subscribed channels at a time.
