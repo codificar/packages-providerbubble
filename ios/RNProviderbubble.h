@@ -5,7 +5,7 @@
 #import <React/RCTBridgeModule.h>
 #endif
 
-@interface RNProviderbubble : NSObject <RCTBridgeModule>
+@interface RNProviderBubble : NSObject <RCTBridgeModule>
 
 @end
   

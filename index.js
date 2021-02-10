@@ -1,6 +1,6 @@
 
 import { NativeModules } from 'react-native';
 
-const { RNProviderbubble } = NativeModules;
+const { RNProviderBubble } = NativeModules;
 
-export default RNProviderbubble;
+export default RNProviderBubble;

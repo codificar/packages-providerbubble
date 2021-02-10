@@ -1,7 +1,7 @@
 
-#import "RNProviderbubble.h"
+#import "RNProviderBubble.h"
 
-@implementation RNProviderbubble
+@implementation RNProviderBubble
 
 - (dispatch_queue_t)methodQueue
 {
