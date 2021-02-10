@@ -84,7 +84,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		}
 	};
 
-	public RNProviderbubbleModule(ReactApplicationContext reactContext) {
+	public RNProviderBubbleModule(ReactApplicationContext reactContext) {
 		super(reactContext);
 
 		this.reactContext = reactContext;

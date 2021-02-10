@@ -37,10 +37,10 @@ import android.media.MediaPlayer;
 
 public class BubbleService extends Service {
     public static final String APP_NAME = "Prestação de Serviços"; // TODO isso deve vir externo
-    public static final String REACT_CLASS = "BubbleService";
+    public static final String REACT_CLASS = "Provde";
     private NotificationManager mNotificationManager;
 
-    public static final String FOREGROUND = "br.com.codificar.providerbubble.BubbleService";
+    public static final String FOREGROUND = "br.com.codificar.providerbubble";
     private static int NOTIFICATION_ID = 3313;
 	  private static int PERMISSION_OVERLAY_SCREEN = 78;
     private WindowManager windowManager;
@@ -150,7 +150,7 @@ public class BubbleService extends Service {
 
         activateWakeLock();
 		    if (android.os.Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(getApplicationContext())) {
-            BubbleServiceBridgeModule.emitShowOverAppsAlert();
+            RNProviderBubbleModule.emitShowOverAppsAlert();
             return;
         }
     }
@@ -526,10 +526,10 @@ public class BubbleService extends Service {
     }
 
     public void setImageVector(){
-        int imageVector = R.drawable.app_bubble_default;
+        int imageVector = R.drawable.bubble_default;
 
         if(onRide)
-            imageVector =  R.drawable.app_bubble_service;
+            imageVector =  R.drawable.bubble_service;
 
         if(chatHead!=null && imageVector!=0) {
             chatHead.setImageResource(imageVector);
@@ -545,14 +545,17 @@ public class BubbleService extends Service {
     };
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if((android.os.Build.VERSION.SDK_INT < 23) ||
-            (android.os.Build.VERSION.SDK_INT >= 23 && Settings.canDrawOverlays(getApplicationContext()))){
-                startForeground(NOTIFICATION_ID, prepareStartForeground(intent, flags, startId)
-            );
-        }
-        else {
-            prepareStart(intent, flags, startId);
+    public int onStartCommand  (Intent intent, int flags, int startId) {
+        if(
+            (android.os.Build.VERSION.SDK_INT < 23) ||
+            (android.os.Build.VERSION.SDK_INT >= 23 && Settings.canDrawOverlays(getApplicationContext()))
+        ){
+            // startForeground(
+            //     NOTIFICATION_ID,
+            //     prepareStartForeground(intent, flags, startId)
+            // );
+        } else {
+            // prepareStart(intent, flags, startId);
         }
 
         if (startId == START_STICKY) {
