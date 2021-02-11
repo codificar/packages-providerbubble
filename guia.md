@@ -18,6 +18,12 @@ Cobriremos esse artigo em português com intuito de se ensinar esse processo que
 
 - um conhecimento básico em *swift*, *android* e *javascript*
 
+##### conselho de amigo
+
+- Use yarn ao invez de npm amigo, o yarn tem velocidades bem superiores e comandos otimizados e é bom conhecer uma ferramenta nova, o Yarn busca o conteúdo e pacotes do mesmo *registry* e permite que você paralelize o download dos pacotes com um simples `yarn install`. Use o comando a seguir para baixar o yarn
+
+`npm install -g yarn.`
+
 #### Indice
   - [1 Criando seu pacote](#1-criando-seu-pacote)
   - [2 Noções sobre a programação de um pacote.](#2-noções-sobre-a-programação-de-um-pacote)
@@ -104,38 +110,73 @@ Para criar um pacote é necessário de se instalar o pacote *react-native-create
 
 ### 2.1. android
 
-RNPacoteACriarPackage.java
-RNPacoteACriarModule.java
-RNPacoteACriarManager.java
+Estes são os arquivos que existem em um nativo Android que referenciamos para o código react-native:
+
+**RNPacoteACriarPackage.java**
+
+**RNPacoteACriarModule.java**
+
+**RNPacoteACriarManager.java**
 
 ### 2.2. ios
 
-RNPacoteACriar.h
-RNPacoteACriar.m
+Estes são os arquivos que existem em um nativo ios que referenciamos para o código react-native:
+
+**RNPacoteACriar.h**
+
+**RNPacoteACriar.m**
 
 ### 2.3. javascript
 
-index.js
+Estes são os arquivos que existem em um nativo *Android* que referenciamos para o código react-native:
+
+**index.js** - O index funciona como a ponta que conecta todos os arquivos anteriores, quando você usar a função da blibioteca ele verifica aqui e usando a blibioteca do react procura nas blibiotecas nativas com nomes próximos que se remetam ao código normal.
 
 ## 3. Migrando o seu código para estrutura de um pacote.
 
 Caso o código já exista é possível criar um pacote para ele, para isso seguiremos certos passos que serão narrados aqui.
+
 ### 3.1. Primeiros Passos
 
-- Criar um projeto com o comando acima;
+- Criar um projeto com o comando citado [acima](#1-criando-seu-pacote);
 - Para a estrutura criada copiaremos o código android, em main, java , etc ...
   - Copiar o Package, Module e Manager já existentes
   - Renomear as classes desses arquivos acima;
   - Renomear o pacote desses arquivos acima;
   - Refatorar trocando todos os locais que refira aos nomes antigos;
   - Copiar outros arquivos java que possam estar sendo utilizados;
+
 - Para o index.js você usar o arquivo que funcionava de bridge no seu projeto;
   - Copie as copie as funções para index.js;
   - Renomear o nome do NativeModules para o nome novo gerado pelo pacote npm que usamos que cria;
-  - Refatorar as referências antigas para os nomes novos ;
-### 3.2. Dificuldades
+  - Refatorar as referências antigas para os nomes novos;
 
+- Para ios é melhor você criar um projeto do zero no Xcode
+  - ir copiando códigos antigos com os nomes sugeridos pela ferramenta
+  - recomendo começar ios apenas após acabar android.
+  
+### 3.2. Passos Intermediarios e Dificuldades Encontradas
+
+- Para testar e verificar o que falta usaremos os dois comandos abaixo. 
+
+`npm install — save <path to Library>`
+
+`react-native link <module name created in node module>`
+
+- Primeira dificuldade encontrada foi correlação entre o código, que é removido do projeto para modularizar, com outros funções e códigos nativos que podem acabar atrapalhando a modularização
+
+- Verificar a compilação do código para testar e adicionar as depencencias necessárias, em android eu encontrei esses arquivos em : `<path to project>/android/app/build.gradle` , é melhor ir brincando com isso e testando. Campo de dependencies { ... }, e lembrar de outras partes como o BUCK e as blibiotecas *libraries* de cada projeto. (CADA CASO é um CASO).
+  
+- As referências ao código que anterior fazia parte do projeto devem ser alteradas. Para isso você pode apenas ir mudando os imports para ter de refatorar menos código em seu project react-native ( não esquecer de fazer um ctrl+f e procurar em todo o seu projeto).
+  - ao invez de `<path to project>/<path to code file.js>` para `<path to project>/<library name registred in node_modules>`, isso é possível com os códigos citados acima.
+  
 ### 3.3. Dicas
+
+- Esse tipo de migração toma tempo e requer que o projeto sejá rehomologado, faça isso com paciência e espaço para erros e experimentação.
+- Use um IDE de preferência o Android Studio que vai ajudar importar o que faltar em mudanças.
+- É uma boa oportunidade para retestar o seu projeto e verificar falhas , testar em versões antigas de android e apis. Afinal grande parte dos usuarios não usam sistemas mais recentes.
+- Prioritariamente é melhor que sejá documentado seu código. Afinal não adianta você ter um código sem comentários e explicações para reutilizar e compartilhar em outros projetos. Se as pessoas não entenderem o seu código podem acabar é quebrando ele, então talvez sejá melhor comentar o código primeiro.
+- Procure uma blibioteca que tenha código nativo e estude um poquinho como ela faz X,Y e Z. Afinal uma base comparativa sempre ajuda.
 
 ## 1.4. Publicando no npm.
 
