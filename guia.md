@@ -159,7 +159,7 @@ Caso o código já exista é possível criar um pacote para ele, para isso segui
 
 - Para testar e verificar o que falta usaremos os dois comandos abaixo. 
 
-`npm install — save <path to Library>`
+`npm install -- save <path to Library>`
 
 `react-native link <module name created in node module>`
 
