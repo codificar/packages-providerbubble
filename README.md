@@ -1,6 +1,16 @@
 
 # react-native-provider-bubble
 
+## Testes Locais:
+
+git clone esse repo
+
+entra nele da pwd , copia o path.
+
+no projeto que vai usar npm -- save 'path'
+
+da npm install agora.
+
 ## Getting started
 
 `$ npm install react-native-provider-bubble --save`
