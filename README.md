@@ -3,13 +3,15 @@
 
 ## Testes Locais:
 
-git clone esse repo
+- git clone nesse repositório: `git clone https://git.codificar.com.br/packages/providerbubble`
 
-entra nele da pwd , copia o path.
+- `cd providerbubble`
 
-no projeto que vai usar npm -- save 'path'
+- rode `pwd`, ou melhor:  copie o path `PATHAQUI=$(pwd)`
 
-da npm install agora.
+- va ao projeto que vai usar esse package e rode: `npm install -- save $PATHAQUI`
+
+- rode em `npm install`
 
 ## Getting started
 
