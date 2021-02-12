@@ -8,7 +8,7 @@ import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.pubsub.RedisPubSubAdapter;
 import com.lambdaworks.redis.pubsub.RedisPubSubConnection;
 
-import br.com.codificar.providerbubble.BubbleServiceBridgeModule;
+import br.com.codificar.providerbubble.RNProviderBubbleModule;
 
 /**
  * A handler to a Redis PubSub client. Can handle multiple subscribed channels at a time.
@@ -20,7 +20,7 @@ public class RedisHandler {
     private RedisPubSubConnection<String, String> redisOutConnection;  // the Redis connection for publish
     private RedisPubSubAdapter<String, String> listener;    // the Redis channels listener
 
-    private BubbleServiceBridgeModule bridgeModule;
+    private RNProviderBubbleModule bridgeModule;
 
     private static RedisHandler singletonHandler;   // singleton instance
 
@@ -28,11 +28,11 @@ public class RedisHandler {
      * Get the singleton Redis handler instance
      * 
      * @param redisURI the Redis connection URI
-     * @param module the BubbleServiceBridgeModule instance
+     * @param module the RNProviderBubbleModule instance
      * 
      * @return the handler singleton instance
      */
-    public static RedisHandler getInstance(String redisURI, BubbleServiceBridgeModule module) {
+    public static RedisHandler getInstance(String redisURI, RNProviderBubbleModule module) {
         if(singletonHandler == null) {
             singletonHandler = new RedisHandler(redisURI, module);
         }
@@ -43,9 +43,9 @@ public class RedisHandler {
      * Create a new Redis connection client with a single listener for all channels subscribed
      * 
      * @param redisURI the Redis connection URI
-     * @param module the BubbleServiceBridgeModule instance
+     * @param module the RNProviderBubbleModule instance
      */
-    private RedisHandler(String redisURI, BubbleServiceBridgeModule module) {
+    private RedisHandler(String redisURI, RNProviderBubbleModule module) {
         this.redisURI = redisURI;
         this.bridgeModule = module;
 

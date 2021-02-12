@@ -17,10 +17,13 @@ Cobriremos esse artigo em português com intuito de se ensinar esse processo que
 `nvm install node`
 
 - um conhecimento básico em *swift*, *android* e *javascript*
+- instalar modulo *npm* do *react-native*
+
+`npm install -g react-native-cli`
 
 ##### conselho de amigo
 
-- Use yarn ao invez de npm amigo, o yarn tem velocidades bem superiores e comandos otimizados e é bom conhecer uma ferramenta nova, o Yarn busca o conteúdo e pacotes do mesmo *registry* e permite que você paralelize o download dos pacotes com um simples `yarn install`. Use o comando a seguir para baixar o yarn
+- Use *yarn* ao invez de npm. O yarn tem velocidades superiores e comandos otimizados e é bom conhecer uma ferramenta nova. Também busca o conteúdo e pacotes do mesmo *registry* e permite que você paralelize o download dos pacotes com um simples `yarn install`. Use o comando a seguir para baixar o yarn
 
 `npm install -g yarn.`
 
@@ -169,7 +172,9 @@ Caso o código já exista é possível criar um pacote para ele, para isso segui
   
 - As referências ao código que anterior fazia parte do projeto devem ser alteradas. Para isso você pode apenas ir mudando os imports para ter de refatorar menos código em seu project react-native ( não esquecer de fazer um ctrl+f e procurar em todo o seu projeto).
   - ao invez de `<path to project>/<path to code file.js>` para `<path to project>/<library name registred in node_modules>`, isso é possível com os códigos citados acima.
-  
+
+- Uso de Recursos do Projeto que vai usar a biblioteca de código no android. Isso é uma das dificuldades que é provável que você vai encontrar. 
+
 ### 3.3. Dicas
 
 - Esse tipo de migração toma tempo e requer que o projeto sejá rehomologado, faça isso com paciência e espaço para erros e experimentação.
