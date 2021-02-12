@@ -464,9 +464,9 @@ public class BubbleService extends Service {
         Log.d(TAG, "Into Bubble.chathead_longclick() ");
     }
 
-    private void goToActivity(Class c) {
+    private void goToActivity(Class class) {
         if (minVersion())  {
-            Intent mainIntent = new Intent(this, c);
+            Intent mainIntent = new Intent(this, class);
             PendingIntent mainPIntent = PendingIntent.getActivity(this, 0,
                     mainIntent, 0);
             mainIntent.setAction("android.intent.action.MAIN");
@@ -479,7 +479,7 @@ public class BubbleService extends Service {
             }
         }
         else{
-            Intent intent = new Intent(this, c);
+            Intent intent = new Intent(this, class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
