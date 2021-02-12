@@ -11,7 +11,9 @@
 
 - va ao projeto que vai usar esse package e rode: `npm install -- save $PATHAQUI`
 
-- rode em `npm install`
+- rode em `npm install`.
+
+- `rm -rf node_modules && yarn install && yarn android`
 
 ## Getting started
 

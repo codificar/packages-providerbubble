@@ -45,5 +45,6 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'com.android.volley:volley:1.1.1'
+
 }
   

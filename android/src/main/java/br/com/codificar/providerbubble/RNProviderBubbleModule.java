@@ -15,6 +15,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import androidx.annotation.Nullable;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Context;
@@ -24,9 +26,19 @@ import android.view.WindowManager;
 
 import android.graphics.PixelFormat;
 import android.os.Build;
-
 import android.net.Uri;
 import android.provider.Settings;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import android.graphics.PixelFormat;
+import android.os.Build;
+import android.util.Log;
+import static java.util.concurrent.TimeUnit.*;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Request.Method;
