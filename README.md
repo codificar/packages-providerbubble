@@ -7,7 +7,7 @@
 
 - `cd providerbubble`
 
-- rode `pwd`, ou melhor:  copie o path `PATHAQUI=$(pwd)`
+- use o comando `pwd` para saber o local, ou melhor:  copie o path `PATHAQUI=$(pwd)`
 
 - va ao projeto que vai usar esse package e rode: `npm install -- save $PATHAQUI`
 
