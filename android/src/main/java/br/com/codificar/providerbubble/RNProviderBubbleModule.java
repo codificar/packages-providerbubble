@@ -55,7 +55,7 @@ import br.com.codificar.providerbubble.BubbleService;
 import br.com.codificar.providerbubble.RedisHandler;
 
 
-public class RNProviderBubbleModule extends ReactContextBaseJavaModule implements LifecycleEventListener, AsyncTaskCompleteListener {
+public class RNProviderBubbleModule extends ReactContextBaseJavaModule implements AsyncTaskCompleteListener , LifecycleEventListener {
 
 	public static final String REACT_CLASS = "RNProviderBubble";
 	private static ReactApplicationContext reactContext = null;
@@ -96,6 +96,78 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		}
 	};
 
+
+	/**
+	 * Monitor app lifecycle
+	 */
+	@Override
+	public void onHostResume() {
+		// Activity `onResume`
+		hostActive = true;
+	}
+
+
+	@Override
+	public void onHostPause() {
+		// Activity `onPause`
+		hostActive = false;
+	}
+
+	@Override
+	public void onHostDestroy() {
+		try {
+			// Set provider offline
+			if(status != null && status.equals(ONLINE))
+			{
+				this.toggleService(false);
+				RedisHandler.getInstance(this.redisURI, this)
+					.unsubscribePubSub("provider."+id);
+
+				HashMap<String, String> map = new HashMap<>();
+				map.put("url", changeStateURL);
+				map.put("id", id);
+				map.put("token", token);
+
+				if(requestQueue == null)
+					requestQueue = Volley.newRequestQueue(Objects.requireNonNull(getCurrentActivity()));
+
+				requestQueue.add(new VolleyHttpRequest(Method.POST, map, TOGGLE, this, null));
+			}
+		}
+		catch (Exception ex){
+			//Log.d("onHostDestroy:ex", ex.getMessage());
+		}
+	}
+
+	@Override
+	public void onTaskCompleted(String response, int serviceCode) {
+		switch (serviceCode){
+			case PING:
+
+				JSONObject jsonObject = null;
+				try {
+					jsonObject = new JSONObject(response);
+					if (jsonObject.has(INCOMING_REQUESTS)) {
+						JSONArray jsonArray = jsonObject.getJSONArray(INCOMING_REQUESTS);
+						if (jsonArray.length() > 0 ) {
+							JSONObject jsonLikeRedis = new JSONObject();
+							jsonLikeRedis.put("data", jsonObject);
+							handleMessage("ping", jsonLikeRedis.toString());
+
+						}
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				Log.d("PING", response);
+				break;
+
+			default:
+				break;
+		}
+	}
+
 	public RNProviderBubbleModule(ReactApplicationContext reactContext) {
 		super(reactContext);
 
@@ -104,6 +176,12 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		BubbleService.currentActivity = getCurrentActivity();
 		reactContext.addLifecycleEventListener(this);
 	}
+
+
+	// @Override
+	// public List<Class<? extends JavaScriptModule>> createJSModules() {
+	// 	return Collections.emptyList();
+	// }
 
 	@Override
 	public String getName() {
