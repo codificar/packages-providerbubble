@@ -15,6 +15,22 @@
 
 - `rm -rf node_modules && yarn install && yarn android`
 
+
+## Pre Requisitos 
+
+Seu projeto precisa ter na parte nativa android no values/strings.xml os seguintes campos:
+
+`````
+<string name="app_name">Meu Aplicativo</string>
+<string name="display_over_other_apps"> O Aplicativo está sendo exibido sobre outros apps</string>
+<string name="display_over_other_apps_message">Se você não quiser que o Aplicativo use essa função, clique para abrir as configurações e desative-a.</string>
+<string name="over_other_apps_title">Permitir que o seja exibido sobre outros apps?</string>
+<string name="over_other_apps_message">Essa permissão é importante para que você possa usar todas as funcionalidades do app.</string>
+   
+`````
+
+imagem do mipmap deve chamar ic_launcher.
+
 ## Getting started
 
 `$ npm install react-native-provider-bubble --save`

@@ -1,36 +1,49 @@
 package br.com.codificar.providerbubble;
 
-import br.com.codificar.providerbubble.R;
-import br.com.codificar.providerbubble.MainActivity;
+// import br.com.codificar.providerbubble.R;
+//import br.com.codificar.providerbubble.MainActivity;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.NotificationChannel;
+import android.R;
+
 import android.os.IBinder;
 import android.os.PowerManager;
-import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
-import android.graphics.BitmapFactory;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+
+import androidx.annotation.Nullable;
+
+import androidx.core.app.NotificationCompat;
+
+import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
+import android.graphics.Point;
+
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.NotificationChannel;
+import android.app.PendingIntent;
+import android.app.Service;
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.DialogInterface;
+
 import android.provider.Settings;
+
 import android.util.Log;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+
 import android.widget.ImageView;
-import android.content.DialogInterface;
+
 import android.net.Uri;
 
 import android.media.MediaPlayer;
@@ -51,6 +64,7 @@ public class BubbleService extends Service {
     private String sMsg = "";
     private static final String TAG = "Bubble";
     private static boolean onRide = false ;
+    public static Activity currentActivity ; // TODO isso aqui funcionando.
 
     Handler timeControlHandler = new Handler();
     Runnable timeControlRunnable = new Runnable() {
@@ -112,9 +126,10 @@ public class BubbleService extends Service {
 
         prepareStart(intent, flags, startId);
 
-        String title = getString(R.string.app_name);
-        String text = getString(R.string.display_over_other_apps);
-        String ticker = getString(R.string.display_over_other_apps_message);
+        Context context = getApplicationContext();
+        String title = context.getResources().getString(context.getResources().getIdentifier("app_name", "string", context.getPackageName()));
+        String text = context.getResources().getString(context.getResources().getIdentifier("display_over_other_apps", "string", context.getPackageName()));
+        String ticker = context.getResources().getString(context.getResources().getIdentifier("display_over_other_apps_message", "string", context.getPackageName()));
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
@@ -128,10 +143,11 @@ public class BubbleService extends Service {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "provider_channel");
-
+        //.setSmallIcon(R.mipmap.ic_launcher)  
+        
         builder
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+            .setSmallIcon(context.getResources().getDrawable(context.getResources().getIdentifier("ic_launcher", "mipmap", context.getPackageName()))) //TODO MIPMAP
+            .setLargeIcon(context.getResources().getDrawable(context.getResources().getIdentifier("ic_launcher", "mipmap", context.getPackageName()))) //TODO MIPMAP
             .setContentTitle(text)
             .setContentText(ticker)
             .setTicker(ticker)
@@ -179,13 +195,13 @@ public class BubbleService extends Service {
             showBubbleDialog = new android.app.AlertDialog.Builder(getApplicationContext());
         }
 
-        showBubbleDialog.setTitle(getString(R.string.over_other_apps_title));
-        showBubbleDialog.setMessage(getString(R.string.over_other_apps_message));
+        showBubbleDialog.setTitle(context.getResources().getString(context.getResources().getIdentifier("over_other_apps_title", "string", context.getPackageName())));
+        showBubbleDialog.setMessage( context.getResources().getString(context.getResources().getIdentifier("over_other_apps_message", "string", context.getPackageName())));
 
         showBubbleDialog.setPositiveButton("yes",
             new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package: com.br.motoristaprivado.prestador"));
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse( "package: " + context.getPackageName() )); // TODO esse treco aqui
                     getApplicationContext().startActivity(intent);
                 }
             });
@@ -455,15 +471,12 @@ public class BubbleService extends Service {
         /*
          * If Activity is not visible, bubble is clickable.
          */
-        if(!MainActivity.isActivityVisible()){
+        /*if(!MainActivity.isActivityVisible()){
             goToActivity(MainActivity.class);
-        }
+        }*/
     }
 
-    private void chathead_longclick() {
-        Log.d(TAG, "Into Bubble.chathead_longclick() ");
-    }
-
+/*
     private void goToActivity(Class class) {
         if (minVersion())  {
             Intent mainIntent = new Intent(this, class);
@@ -484,6 +497,25 @@ public class BubbleService extends Service {
             startActivity(intent);
         }
     }
+*/
+
+    private void chathead_longclick() {
+        Log.d(TAG, "Into Bubble.chathead_longclick() ");
+    }
+
+    // public static Drawable getDrawable(Context context, String resource_name){
+    //     try{
+    //         int resId = context.getResources().getIdentifier(resource_name, "drawable", context.getPackageName());
+    //         if(resId != 0){
+    //             return context.getResources().getDrawable(resId);
+    //         }
+    //     }catch(Exception e){
+    //         Log.e(TAG,"getDrawable - resource_name: "+resource_name);
+    //         e.printStackTrace();
+    //     }
+
+    //     return null;
+    // }
 
     private void showMsg(String sMsg) {
         if (chatHead != null) {
@@ -493,7 +525,6 @@ public class BubbleService extends Service {
             myHandler.postDelayed(myRunnable, 4000);
         }
     }
-
 
     public void startRequest(final long durationSecs) {
         long durationMillis = durationSecs*1000;
@@ -526,11 +557,13 @@ public class BubbleService extends Service {
     }
 
     public void setImageVector(){
-        int imageVector = R.drawable.bubble_default;
-
+        Context context = getApplicationContext();
+        // int imageVector = R.drawable.app_bubble_default;
+        int imageVector = context.getResources().getIdentifier("app_bubble_default", "drawable", context.getPackageName());
+        // int imageVector = R.drawable.app_bubble_services;    
         if(onRide)
-            imageVector =  R.drawable.bubble_service;
-
+            imageVector = context.getResources().getIdentifier("app_bubble_services", "drawable", context.getPackageName());
+    
         if(chatHead!=null && imageVector!=0) {
             chatHead.setImageResource(imageVector);
         }
