@@ -101,7 +101,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 
 		this.reactContext = reactContext;
 		this.reactContext.addActivityEventListener(mActivityEventListener);
-
+		BubbleService.currentActivity = getCurrentActivity();
 		reactContext.addLifecycleEventListener(this);
 	}
 
