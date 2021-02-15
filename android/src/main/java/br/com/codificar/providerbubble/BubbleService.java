@@ -146,8 +146,8 @@ public class BubbleService extends Service {
         //.setSmallIcon(R.mipmap.ic_launcher)  
         
         builder
-            .setSmallIcon(context.getResources().getDrawable(context.getResources().getIdentifier("ic_launcher", "mipmap", context.getPackageName()))) //TODO MIPMAP
-            .setLargeIcon(context.getResources().getDrawable(context.getResources().getIdentifier("ic_launcher", "mipmap", context.getPackageName()))) //TODO MIPMAP
+            .setSmallIcon(context.getResources().getIdentifier("ic_launcher", "mipmap", context.getPackageName())) //TODO MIPMAP
+            .setLargeIcon(BitmapFactory.decodeResource(getResources(), context.getResources().getIdentifier("ic_launcher", "mipmap", context.getPackageName()))) //TODO MIPMAP
             .setContentTitle(text)
             .setContentText(ticker)
             .setTicker(ticker)
@@ -188,6 +188,7 @@ public class BubbleService extends Service {
 
     public void openOverAppsAlert() {
         android.app.AlertDialog.Builder showBubbleDialog;
+        Context context = getApplicationContext();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             showBubbleDialog = new android.app.AlertDialog.Builder(getApplicationContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
@@ -200,6 +201,7 @@ public class BubbleService extends Service {
 
         showBubbleDialog.setPositiveButton("yes",
             new DialogInterface.OnClickListener() {
+
                 public void onClick(DialogInterface dialog, int which) {
                     Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse( "package: " + context.getPackageName() )); // TODO esse treco aqui
                     getApplicationContext().startActivity(intent);
@@ -560,9 +562,18 @@ public class BubbleService extends Service {
         Context context = getApplicationContext();
         // int imageVector = R.drawable.app_bubble_default;
         int imageVector = context.getResources().getIdentifier("app_bubble_default", "drawable", context.getPackageName());
+
+        if(imageVector == 0){
+            Log.e(TAG,"error default image id == 0");
+        }
+
         // int imageVector = R.drawable.app_bubble_services;    
-        if(onRide)
+        if(onRide){
             imageVector = context.getResources().getIdentifier("app_bubble_services", "drawable", context.getPackageName());
+            if(imageVector == 0){
+                Log.e(TAG,"error on ride image id == 0");
+            }
+        }
     
         if(chatHead!=null && imageVector!=0) {
             chatHead.setImageResource(imageVector);
