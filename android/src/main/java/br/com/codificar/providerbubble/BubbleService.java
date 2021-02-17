@@ -239,7 +239,6 @@ public class BubbleService extends Service {
 
         chatHead = new ImageView(getApplicationContext());
 
-        Log.d(TAG,"meh esteve aqui");
         setImageVector();
 
 
@@ -472,36 +471,45 @@ public class BubbleService extends Service {
     }
 
     private void chathead_click() {
-        /*
-         * If Activity is not visible, bubble is clickable.
-         */
-        /*if(!MainActivity.isActivityVisible()){
-            goToActivity(MainActivity.class);
-        }*/
+
+//
+//        Log.i("LOGGANDO AQUI", here);
+
+        goToActivity();
+
     }
 
-/*
-    private void goToActivity(Class class) {
-        if (minVersion())  {
-            Intent mainIntent = new Intent(this, class);
-            PendingIntent mainPIntent = PendingIntent.getActivity(this, 0,
-                    mainIntent, 0);
-            mainIntent.setAction("android.intent.action.MAIN");
-            mainIntent.addCategory("android.intent.category.LAUNCHER");
-            mainIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            try {
+    public static boolean minVersion(){
+        Log.e(TAG, "Device: "+ Build.VERSION.SDK_INT);
+        Log.e(TAG, "Min: "+ Build.VERSION_CODES.LOLLIPOP);
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+    }
+
+
+    private void goToActivity() {
+        try {
+            String here = getApplicationContext().getPackageName();
+            if (minVersion()) {
+                Intent mainIntent = new Intent(this, Class.forName(here + ".MainActivity"));
+                PendingIntent mainPIntent = PendingIntent.getActivity(this, 0,
+                        mainIntent, 0);
+                mainIntent.setAction("android.intent.action.MAIN");
+                mainIntent.addCategory("android.intent.category.LAUNCHER");
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
                 mainPIntent.send();
-            } catch (PendingIntent.CanceledException e) {
-                Log.e(TAG, e.getMessage());
+
+            } else {
+                Intent intent = new Intent(this, Class.forName(here + ".MainActivity"));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
             }
         }
-        else{
-            Intent intent = new Intent(this, class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
-*/
+
 
     private void chathead_longclick() {
         Log.d(TAG, "Into Bubble.chathead_longclick() ");
@@ -511,7 +519,6 @@ public class BubbleService extends Service {
         if (chatHead != null) {
             Log.d(TAG, TAG + ".showMsg -> sMsg=" + sMsg);
             myHandler.removeCallbacks(myRunnable);
-            Log.d(TAG,"banana esteve aqui");
             setImageVector();
             myHandler.postDelayed(myRunnable, 4000);
         }
@@ -519,7 +526,6 @@ public class BubbleService extends Service {
 
     public void startRequest(final long durationSecs) {
         long durationMillis = durationSecs*1000;
-        Log.d(TAG,"eduardo esteve aqui");
         setImageVector();
 
         startTimeControl(durationMillis);
@@ -542,7 +548,6 @@ public class BubbleService extends Service {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG,"joaquim esteve aqui");
                 setImageVector();
             }
         }, delay);
