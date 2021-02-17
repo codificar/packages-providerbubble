@@ -288,6 +288,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	public void handleMessage(String channel, String message) {
 		lastChannel = channel;
 		// TODO: if(channel.startsWith("provider"))
+
 		BubbleService.startRequestBubble(getReactApplicationContext(), 2);
 		
 		emitRequest(channel ,message);
@@ -347,7 +348,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	public void finishRequest(Promise promise) {
 		String result = "Success";
 		try {
-			
+
 			BubbleService.stopRequestBubble(getReactApplicationContext(), 2);
 
 		} catch (Exception e) {

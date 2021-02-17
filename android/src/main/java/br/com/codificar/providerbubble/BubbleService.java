@@ -50,12 +50,12 @@ import android.media.MediaPlayer;
 
 public class BubbleService extends Service {
     public static final String APP_NAME = "Prestação de Serviços"; // TODO isso deve vir externo
-    public static final String REACT_CLASS = "Provde";
+    public static final String REACT_CLASS = "RNProviderBubble";
     private NotificationManager mNotificationManager;
 
-    public static final String FOREGROUND = "br.com.codificar.providerbubble";
+    public static final String FOREGROUND = "br.com.codificar.providerbubble.BubbleService";
     private static int NOTIFICATION_ID = 3313;
-	  private static int PERMISSION_OVERLAY_SCREEN = 78;
+    private static int PERMISSION_OVERLAY_SCREEN = 78;
     private WindowManager windowManager;
     private static ImageView chatHead;
     private int x_init_cord, y_init_cord, x_init_margin, y_init_margin;
@@ -143,7 +143,6 @@ public class BubbleService extends Service {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "provider_channel");
-        //.setSmallIcon(R.mipmap.ic_launcher)  
         
         builder
             .setSmallIcon(context.getResources().getIdentifier("ic_launcher", "mipmap", context.getPackageName())) //TODO MIPMAP
@@ -238,9 +237,11 @@ public class BubbleService extends Service {
                 PixelFormat.TRANSLUCENT);
         paramRemove.gravity = Gravity.TOP | Gravity.LEFT;
 
-        chatHead = new ImageView(this);
+        chatHead = new ImageView(getApplicationContext());
 
+        Log.d(TAG,"meh esteve aqui");
         setImageVector();
+
 
         windowManager.getDefaultDisplay().getSize(szWindow);
 
@@ -278,6 +279,7 @@ public class BubbleService extends Service {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
                 WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams) chatHead.getLayoutParams();
 
                 int x_cord = (int) event.getRawX();
@@ -426,7 +428,7 @@ public class BubbleService extends Service {
     private void moveToLeft(final int x_cord_now) {
         final int x = szWindow.x - x_cord_now;
 
-        new CountDownTimer(500, 5) {
+        new CountDownTimer(50, 5) {
             WindowManager.LayoutParams mParams = (WindowManager.LayoutParams) chatHead.getLayoutParams();
 
             public void onTick(long t) {
@@ -444,7 +446,7 @@ public class BubbleService extends Service {
     }
 
     private void moveToRight(final int x_cord_now) {
-        new CountDownTimer(500, 5) {
+        new CountDownTimer(50, 5) {
             WindowManager.LayoutParams mParams = (WindowManager.LayoutParams) chatHead.getLayoutParams();
 
             public void onTick(long t) {
@@ -461,9 +463,9 @@ public class BubbleService extends Service {
         }.start();
     }
 
-    private double bounceValue(long step, long scale) {
-        return scale * Math.exp(-0.055 * step) * Math.cos(0.08 * step);
-    }
+//    private double bounceValue(long step, long scale) {
+//        return scale * Math.exp(-0.055 * step) * Math.cos(0.08 * step);
+//    }
 
     private int getStatusBarHeight() {
         return (int) Math.ceil(25 * getApplicationContext().getResources().getDisplayMetrics().density);
@@ -505,24 +507,11 @@ public class BubbleService extends Service {
         Log.d(TAG, "Into Bubble.chathead_longclick() ");
     }
 
-    // public static Drawable getDrawable(Context context, String resource_name){
-    //     try{
-    //         int resId = context.getResources().getIdentifier(resource_name, "drawable", context.getPackageName());
-    //         if(resId != 0){
-    //             return context.getResources().getDrawable(resId);
-    //         }
-    //     }catch(Exception e){
-    //         Log.e(TAG,"getDrawable - resource_name: "+resource_name);
-    //         e.printStackTrace();
-    //     }
-
-    //     return null;
-    // }
-
     private void showMsg(String sMsg) {
         if (chatHead != null) {
             Log.d(TAG, TAG + ".showMsg -> sMsg=" + sMsg);
             myHandler.removeCallbacks(myRunnable);
+            Log.d(TAG,"banana esteve aqui");
             setImageVector();
             myHandler.postDelayed(myRunnable, 4000);
         }
@@ -530,6 +519,7 @@ public class BubbleService extends Service {
 
     public void startRequest(final long durationSecs) {
         long durationMillis = durationSecs*1000;
+        Log.d(TAG,"eduardo esteve aqui");
         setImageVector();
 
         startTimeControl(durationMillis);
@@ -552,6 +542,7 @@ public class BubbleService extends Service {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG,"joaquim esteve aqui");
                 setImageVector();
             }
         }, delay);
@@ -564,14 +555,22 @@ public class BubbleService extends Service {
         int imageVector = context.getResources().getIdentifier("app_bubble_default", "drawable", context.getPackageName());
 
         if(imageVector == 0){
-            Log.e(TAG,"error default image id == 0");
+            imageVector = context.getResources().getIdentifier("bubble_default", "drawable", context.getPackageName());
+            if(imageVector == 0){
+                imageVector = context.getResources().getIdentifier("library_bubble_default", "drawable", context.getPackageName());
+                Log.d(TAG,"bubble_default images not found , using library default id == 0");
+            }
         }
 
         // int imageVector = R.drawable.app_bubble_services;    
         if(onRide){
-            imageVector = context.getResources().getIdentifier("app_bubble_services", "drawable", context.getPackageName());
+            imageVector = context.getResources().getIdentifier("app_bubble_service", "drawable", context.getPackageName());
             if(imageVector == 0){
-                Log.e(TAG,"error on ride image id == 0");
+                imageVector = context.getResources().getIdentifier("bubble_service", "drawable", context.getPackageName());
+                if(imageVector == 0){
+                    imageVector = context.getResources().getIdentifier("library_bubble_service", "drawable", context.getPackageName());
+                    Log.d(TAG,"bubble_service images not found , using library service id == 0");
+                }
             }
         }
     
@@ -594,16 +593,15 @@ public class BubbleService extends Service {
             (android.os.Build.VERSION.SDK_INT < 23) ||
             (android.os.Build.VERSION.SDK_INT >= 23 && Settings.canDrawOverlays(getApplicationContext()))
         ){
-            // startForeground(
-            //     NOTIFICATION_ID,
-            //     prepareStartForeground(intent, flags, startId)
-            // );
+            startForeground(
+                NOTIFICATION_ID,
+                prepareStartForeground(intent, flags, startId)
+            );
         } else {
-            // prepareStart(intent, flags, startId);
+            prepareStart(intent, flags, startId);
         }
 
         if (startId == START_STICKY) {
-            // handleStart();
             return super.onStartCommand(intent, flags, startId);
         } else {
             return START_NOT_STICKY;
@@ -625,7 +623,11 @@ public class BubbleService extends Service {
 
         if ((android.os.Build.VERSION.SDK_INT >= 23 && Settings.canDrawOverlays(getBaseContext())) || (android.os.Build.VERSION.SDK_INT < 23)) {
             try{
-                if(windowManager != null) windowManager.removeView(chatHead);
+
+                if(windowManager != null) {
+                    //windowManager.removeViewImmediate();
+                    windowManager.removeViewImmediate(chatHead);
+                }
             } catch (Exception e){
                 Log.e(TAG, e.getMessage());
             }
@@ -654,38 +656,4 @@ public class BubbleService extends Service {
         }
     }
 
-    public static void startServiceBubble(Context c) {
-        if(c != null) {
-            ctx = c;
-            Log.i(TAG, "Start Service Bubble");
-            Intent intent = new Intent(c, BubbleService.class);
-            c.startService(intent);
-            Log.i(TAG, "Started Service Bubble");
-        }
-    }
-
-    public static void stopServiceBubble(Context c) {
-        if(c != null) {
-            onRide = false;
-            Log.i(TAG, "Stop Service Bubble");
-            c.stopService(new Intent(c, BubbleService.class));
-            Log.i(TAG, "Stopped Service Bubble");
-        }
-    }
-
-    public static void stopTimeControlBubble(Context c) {
-        if(c != null) {
-            Log.i(TAG, "Stop Time Control Bubble");
-            Intent intent = new Intent(c, BubbleService.class);
-            intent.putExtra("stopTimeControl", true);
-            c.startService(intent);
-            Log.i(TAG, "Stopped Time Control Bubble");
-        }
-    }
-
-    public static boolean minVersion(){
-        Log.e(TAG, "Device: "+ Build.VERSION.SDK_INT);
-        Log.e(TAG, "Min: "+ Build.VERSION_CODES.LOLLIPOP);
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
-    }
 }
