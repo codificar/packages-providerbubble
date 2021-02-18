@@ -113,22 +113,21 @@ Para criar um pacote é necessário de se instalar o pacote *react-native-create
 
 ### 2.1. android
 
-Estes são os arquivos que existem em um nativo Android que referenciamos para o código react-native:
+Estes são os arquivos que existem em um nativo Android que referenciamos para o código react-native.
 
-**RNPacoteACriarPackage.java**
+**RNPacoteACriarPackage.java**: Uma forma de header e padrão para o código do react encontrar o seu código nativo. Importa os código react do facebook para encontrar o modulo, é a ponte que liga o js com o java.
 
 **RNPacoteACriarModule.java**
-
-**RNPacoteACriarManager.java**
-
+Aonde que se programa tudo do projeto, coloca as funções, e organiza corretamente o código, importa o que vai usar etc.
 ### 2.2. ios
 
 Estes são os arquivos que existem em um nativo ios que referenciamos para o código react-native:
 
 **RNPacoteACriar.h**
+Header do Projeto que possibilita de exportar e achar o package com o mecanism que o react-native implementa, é a ponte que liga o js com o código iOS.
 
 **RNPacoteACriar.m**
-
+Aonde se coloca os RCT_EXPORT e as funções códigos que se utiliza. No meu caso eu juntei o .h e o .m poís estava trabalhando com código de outros funcionários da empresa e swift. Vou falar mais sobre isso abaxo.
 ### 2.3. javascript
 
 Estes são os arquivos que existem em um nativo *Android* que referenciamos para o código react-native:
@@ -168,26 +167,46 @@ Caso o código já exista é possível criar um pacote para ele, para isso segui
 
 - Primeira dificuldade encontrada foi correlação entre o código, que é removido do projeto para modularizar, com outros funções e códigos nativos que podem acabar atrapalhando a modularização
 
-- Verificar a compilação do código para testar e adicionar as depencencias necessárias, em android eu encontrei esses arquivos em : `<path to project>/android/app/build.gradle` , é melhor ir brincando com isso e testando. Campo de dependencies { ... }, e lembrar de outras partes como o BUCK e as blibiotecas *libraries* de cada projeto. (CADA CASO é um CASO).
+- Verificar a compilação do código para testar e adicionar as depencencias necessárias, em android eu encontrei esses arquivos em : `<path to project>/android/app/build.gradle` , é melhor ir brincando com isso e testando. Campo de dependencies { ... }, e lembrar de outras partes como o BUCK e as blibiotecas *libraries* de cada projeto. (CADA CASO é um CASO). Antes de renomear é melhor você fazer um backup com o que tem de iOS que é mais complicado, para o iOS temos que remover pelo XCode e criar pelo XCode devido algumas intrinsidades existentes em programar para iOS.
   
 - As referências ao código que anterior fazia parte do projeto devem ser alteradas. Para isso você pode apenas ir mudando os imports para ter de refatorar menos código em seu project react-native ( não esquecer de fazer um ctrl+f e procurar em todo o seu projeto).
   - ao invez de `<path to project>/<path to code file.js>` para `<path to project>/<library name registred in node_modules>`, isso é possível com os códigos citados acima.
 
-- Uso de Recursos do Projeto que vai usar a biblioteca de código no android. Isso é uma das dificuldades que é provável que você vai encontrar. Nesses Casos você tem que pegar os recursos por contexto.
 
-- Certos códigos no android precisam de ser referenciados pelo Manifest, no caso do que eu fiz, eu usei um serviço e precisei de adicionar o mesmo.
+#### 3.2.1 Android
 
-- Em ios na hora de remover o código do projeto que já possuia ele, deu muito erro com o Auth Mach-O Linker, foi deletando o que podia pelo xcode e depois PodDeintegrate e Pod Install até corrigir o que precisava, além de tbm usar o react-native link.
+- Uso de Recursos do Projeto que vai usar a biblioteca de código no android. Isso é uma das dificuldades que é provável que você vai encontrar. Nesses Casos você tem que pegar os recursos por contexto. Ex: `context.getResources().getIdentifier("app_id", "drawable", context.getPackageName());` e `Context context = getApplicationContext();`.
+
+- O projeto também precisava de abrir atividade do background. E para isso era necessário acessar código fonte do nativo android do projeto, para isso pegamos o nome do pacote `String here = getApplicationContext().getPackageName();` e com o nome do pacote pegavamos a classe `Class.forName(here + ".MainActivity")` e com ela chamei o intent `Intent mainIntent = new Intent(this, Class.forName(here + ".MainActivity"));` e com esse acesso ao intent fazemos as ouras operações.
+
+- Certos códigos no android precisam de ser referenciados pelo Manifest, no caso do que eu fiz, eu usei um serviço e precisei de adicionar o mesmo. `<service android:name="package.name.Service" />`
+
+- Os caminhos e paths devem sempre ser coerentes com package, caso contrário pode prejudicar achar classes e compilar.
+#### 3.2.2 iOS
+
+- Em ios na hora de remover o código do projeto que já possuia ele, deu muito erro com o Auth Mach-O Linker, foi deletando o que podia pelo xcode e depois `pod deintegrate` e `pod install`, e dando *clean* no projeto, até corrigir o que precisava, além de tbm usar o `react-native link`.
+
+- Como era usado código swift no nativo de ios foi necessário usar de uma biblioteca chamada *react-native-swift* e rodar `react-native swiftify` to link correctly to ios.
+
+- E também, por usar swift como mencionado acima, tive de alterar o podspec para adicionar o podfile para o local do código considerando raiz da pasta do package e colocar os arquivos .h,.m e swift,   `s.source_files  = "ios/**/*.{h,m,swift}"`.
   
-  
+- Não esquecer de colocar `package = JSON.parse(File.read(File.join(__dir__, 'package.json')))` no inicio do podspec.
+
+- Mudar os podfiles do que você está usando para o podspec da blibioteca ao ínvez do podfile.
 ### 3.3. Dicas
 
 - Esse tipo de migração toma tempo e requer que o projeto sejá rehomologado, faça isso com paciência e espaço para erros e experimentação.
+  
 - Use um IDE de preferência o Android Studio que vai ajudar importar o que faltar em mudanças.
+  
 - É uma boa oportunidade para retestar o seu projeto e verificar falhas , testar em versões antigas de android e apis. Afinal grande parte dos usuarios não usam sistemas mais recentes.
+  
 - Prioritariamente é melhor que sejá documentado seu código. Afinal não adianta você ter um código sem comentários e explicações para reutilizar e compartilhar em outros projetos. Se as pessoas não entenderem o seu código podem acabar é quebrando ele, então talvez sejá melhor comentar o código primeiro.
+  
 - Procure uma blibioteca que tenha código nativo e estude um poquinho como ela faz X,Y e Z. Afinal uma base comparativa sempre ajuda.
 
+- Aprender a verificar se foi carregado corretamente os códigos da sua blibioteca para ir testando e debugando, no Android Studio é de um jeito e no XCode em outro. Pasta Development Pods no Xcode e no AndroidStudio nas pastas na raiz perto de app quando se abre tem tudo.
+  
 ## 1.4. Publicando no npm.
 
 Depois que o código tenha sido redigido , se deve subir ele para o github, usaremos o endereço desse git do código quando for publicar o componente no npm.
