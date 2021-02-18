@@ -173,8 +173,13 @@ Caso o código já exista é possível criar um pacote para ele, para isso segui
 - As referências ao código que anterior fazia parte do projeto devem ser alteradas. Para isso você pode apenas ir mudando os imports para ter de refatorar menos código em seu project react-native ( não esquecer de fazer um ctrl+f e procurar em todo o seu projeto).
   - ao invez de `<path to project>/<path to code file.js>` para `<path to project>/<library name registred in node_modules>`, isso é possível com os códigos citados acima.
 
-- Uso de Recursos do Projeto que vai usar a biblioteca de código no android. Isso é uma das dificuldades que é provável que você vai encontrar. 
+- Uso de Recursos do Projeto que vai usar a biblioteca de código no android. Isso é uma das dificuldades que é provável que você vai encontrar. Nesses Casos você tem que pegar os recursos por contexto.
 
+- Certos códigos no android precisam de ser referenciados pelo Manifest, no caso do que eu fiz, eu usei um serviço e precisei de adicionar o mesmo.
+
+- Em ios na hora de remover o código do projeto que já possuia ele, deu muito erro com o Auth Mach-O Linker, foi deletando o que podia pelo xcode e depois PodDeintegrate e Pod Install até corrigir o que precisava, além de tbm usar o react-native link.
+  
+  
 ### 3.3. Dicas
 
 - Esse tipo de migração toma tempo e requer que o projeto sejá rehomologado, faça isso com paciência e espaço para erros e experimentação.
