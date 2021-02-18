@@ -1,12 +1,12 @@
 
 
-# Crie sua própria blibioteca/componente react-native e publicar no npm.
+# Crie sua própria biblioteca/componente react-native e publicar no npm.
 
-Objetivo desse artigo é mostrar o básico necessário para se criar o pacote e como transferir migrar um código de um projeto para um pacote de forma que ele possa ser usa de forma modular em outros projetos pessoais ou de uma empresa. 
+Objetivo desse artigo é mostrar o básico necessário para se criar o pacote e como transferir migrar um código de um projeto para um pacote de forma que ele possa ser usado de forma modular em outros projetos pessoais ou de uma empresa. 
 
 Este artigo foi criado para documentar o processo de migração de um código de um projeto da codificar para um pacote para ser reutilizado. O intuito é de se compartilhar internamente com a equipe da codificar e externamente para agregar ao ecossistema desenvolvedor.
 
-Cobriremos esse artigo em português com intuito de se ensinar esse processo que se acha com maior facilidade em ingles e não em pt-br.
+Cobrimos esse artigo em português com intuito de se ensinar esse processo que se acha com maior facilidade em inglês e não em pt-br.
 
 #### pré-requisitos
 
@@ -17,17 +17,17 @@ Cobriremos esse artigo em português com intuito de se ensinar esse processo que
 `nvm install node`
 
 - um conhecimento básico em *swift*, *android* e *javascript*
-- instalar modulo *npm* do *react-native*
+- instalar módulo *npm* do *react-native*
 
 `npm install -g react-native-cli`
 
 ##### conselho de amigo
 
-- Use *yarn* ao invez de npm. O yarn tem velocidades superiores e comandos otimizados e é bom conhecer uma ferramenta nova. Também busca o conteúdo e pacotes do mesmo *registry* e permite que você paralelize o download dos pacotes com um simples `yarn install`. Use o comando a seguir para baixar o yarn
+- Use *yarn* ao invés de npm. O yarn tem velocidades superiores e comandos otimizados e é bom conhecer uma ferramenta nova. Também busca o conteúdo e pacotes do mesmo *registry* e permite que você paraleliza o download dos pacotes com um simples `yarn install`. Use o comando a seguir para baixar o yarn
 
 `npm install -g yarn.`
 
-#### Indice
+#### Índice
   - [1 Criando seu pacote](#1-criando-seu-pacote)
   - [2 Noções sobre a programação de um pacote.](#2-noções-sobre-a-programação-de-um-pacote)
     - [2.1. android](#21-android)
@@ -54,7 +54,7 @@ Cobriremos esse artigo em português com intuito de se ensinar esse processo que
 
 Para criar um pacote é necessário de se instalar o pacote *react-native-create-library* , que cria a estrutura básica inicial de um pacote *react-native*.
 
-- instalar global para uso por linha de comando da blibioteca:
+- instalar global para uso por linha de comando da biblioteca:
 
 `npm install -g react-native-create-library`
 
@@ -62,7 +62,7 @@ Para criar um pacote é necessário de se instalar o pacote *react-native-create
 
 `mkdir pacotes && cd pacotes`
 
-- rodar o comando para criar o pacote , lembra de criar corretamente o identificador do seu aplicativo, visto que este precisa de ser único.
+- rodar o comando para criar o pacote , lembrando de criar corretamente o identificador do seu aplicativo, visto que este precisa de ser único.
 
 `react-native-create-library --package-identifier 	br.com.codificar.pacote_a_criar --platforms android,ios pacote_a_criar`
 
@@ -109,30 +109,29 @@ Para criar um pacote é necessário de se instalar o pacote *react-native-create
 
 ## 2 Noções sobre a programação de um pacote.
 
-é muito provável que as funções utilizadas no seu projeto usem recursos nativos, deverão então ser programadas tanto em ios quanto em android também. Por isso será necessário programar arquivos especificos. Irei nessa parte do documento enumerar e dar uma leve noção sobre esses arquivos. Arquivos estes necessários para se criar um modulo pacote tanto para android quanto ios. Não é o objetivo desse artigo explicar essa parte do processo em profundidade.
+É muito provável que as funções utilizadas no seu projeto usem recursos nativos, deverão então ser programadas tanto em iOS quanto em Android também. Por isso será necessário programar arquivos específicos. Irei nessa parte do documento enumerar e dar uma leve noção sobre esses arquivos. Arquivos estes necessários para se criar um módulo pacote tanto para android quanto ios. Não é o objetivo deste artigo explicar essa parte do processo em profundidade.
 
 ### 2.1. android
 
 Estes são os arquivos que existem em um nativo Android que referenciamos para o código react-native.
 
-**RNPacoteACriarPackage.java**: Uma forma de header e padrão para o código do react encontrar o seu código nativo. Importa os código react do facebook para encontrar o modulo, é a ponte que liga o js com o java.
+**RNPacoteACriarPackage.java**: Uma forma de header e padrão para o código do react encontrar o seu código nativo. Importa os código react do facebook para encontrar o módulo, é a ponte que liga o js com o java.
 
-**RNPacoteACriarModule.java**
-Aonde que se programa tudo do projeto, coloca as funções, e organiza corretamente o código, importa o que vai usar etc.
+**RNPacoteACriarModule.java**: Aonde que se programa tudo do projeto, coloca as funções, e organizar corretamente o código, importa o que vai usar etc.
 ### 2.2. ios
 
 Estes são os arquivos que existem em um nativo ios que referenciamos para o código react-native:
 
 **RNPacoteACriar.h**
-Header do Projeto que possibilita de exportar e achar o package com o mecanism que o react-native implementa, é a ponte que liga o js com o código iOS.
+Header do Projeto que possibilita de exportar e achar o package com o mecanismo que o react-native implementa, é a ponte que liga o js com o código iOS.
 
 **RNPacoteACriar.m**
-Aonde se coloca os RCT_EXPORT e as funções códigos que se utiliza. No meu caso eu juntei o .h e o .m poís estava trabalhando com código de outros funcionários da empresa e swift. Vou falar mais sobre isso abaxo.
+Onde se coloca os RCT_EXPORT e as funções códigos que se utilizam. No meu caso eu juntei o .h e o .m pois estava trabalhando com código de outros funcionários da empresa e swift. Vou falar mais sobre isso abaixo.
 ### 2.3. javascript
 
 Estes são os arquivos que existem em um nativo *Android* que referenciamos para o código react-native:
 
-**index.js** - O index funciona como a ponta que conecta todos os arquivos anteriores, quando você usar a função da blibioteca ele verifica aqui e usando a blibioteca do react procura nas blibiotecas nativas com nomes próximos que se remetam ao código normal.
+**index.js** - O index funciona como a ponta que conecta todos os arquivos anteriores, quando você usar a função da biblioteca ele verifica aqui e usando a biblioteca do react procura nas bibliotecas nativas com nomes próximos que se remetem ao código normal.
 
 ## 3. Migrando o seu código para estrutura de um pacote.
 
@@ -141,11 +140,11 @@ Caso o código já exista é possível criar um pacote para ele, para isso segui
 ### 3.1. Primeiros Passos
 
 - Criar um projeto com o comando citado [acima](#1-criando-seu-pacote);
-- Para a estrutura criada copiaremos o código android, em main, java , etc ...
+- Para a estrutura criada copiamos o código android, em main, java , etc ...
   - Copiar o Package, Module e Manager já existentes
   - Renomear as classes desses arquivos acima;
   - Renomear o pacote desses arquivos acima;
-  - Refatorar trocando todos os locais que refira aos nomes antigos;
+  - Refatorar trocando todos os locais que refere aos nomes antigos;
   - Copiar outros arquivos java que possam estar sendo utilizados;
 
 - Para o index.js você usar o arquivo que funcionava de bridge no seu projeto;
@@ -157,7 +156,7 @@ Caso o código já exista é possível criar um pacote para ele, para isso segui
   - ir copiando códigos antigos com os nomes sugeridos pela ferramenta
   - recomendo começar ios apenas após acabar android.
   
-### 3.2. Passos Intermediarios e Dificuldades Encontradas
+### 3.2. Passos Intermediários e Dificuldades Encontradas
 
 - Para testar e verificar o que falta usaremos os dois comandos abaixo. 
 
@@ -167,45 +166,45 @@ Caso o código já exista é possível criar um pacote para ele, para isso segui
 
 - Primeira dificuldade encontrada foi correlação entre o código, que é removido do projeto para modularizar, com outros funções e códigos nativos que podem acabar atrapalhando a modularização
 
-- Verificar a compilação do código para testar e adicionar as depencencias necessárias, em android eu encontrei esses arquivos em : `<path to project>/android/app/build.gradle` , é melhor ir brincando com isso e testando. Campo de dependencies { ... }, e lembrar de outras partes como o BUCK e as blibiotecas *libraries* de cada projeto. (CADA CASO é um CASO). Antes de renomear é melhor você fazer um backup com o que tem de iOS que é mais complicado, para o iOS temos que remover pelo XCode e criar pelo XCode devido algumas intrinsidades existentes em programar para iOS.
+- Verificar a compilação do código para testar e adicionar as dependências necessárias, em android eu encontrei esses arquivos em : `<path to project>/android/app/build.gradle` , é melhor ir brincando com isso e testando. Campo de dependencies { ... }, e lembrar de outras partes como o BUCK e as bibliotecas *libraries* de cada projeto. (CADA CASO é um CASO). Antes de renomear é melhor você fazer um backup com o que tem de iOS que é mais complicado, para o iOS temos que remover pelo XCode e criar pelo XCode devido algumas intrinsidades existentes em programar para iOS.
   
-- As referências ao código que anterior fazia parte do projeto devem ser alteradas. Para isso você pode apenas ir mudando os imports para ter de refatorar menos código em seu project react-native ( não esquecer de fazer um ctrl+f e procurar em todo o seu projeto).
-  - ao invez de `<path to project>/<path to code file.js>` para `<path to project>/<library name registred in node_modules>`, isso é possível com os códigos citados acima.
+- As referências ao código que anterior fazia parte do projeto devem ser alteradas. Para isso você pode apenas ir mudando os imports para ter de refatorar menos código em seu projeto react-native ( não esquecer de fazer um ctrl+f e procurar em todo o seu projeto).
+  - ao invés de `<path to project>/<path to code file.js>` para `<path to project>/<library name registred in node_modules>`, isso é possível com os códigos citados acima.
 
 
 #### 3.2.1 Android
 
-- Uso de Recursos do Projeto que vai usar a biblioteca de código no android. Isso é uma das dificuldades que é provável que você vai encontrar. Nesses Casos você tem que pegar os recursos por contexto. Ex: `context.getResources().getIdentifier("app_id", "drawable", context.getPackageName());` e `Context context = getApplicationContext();`.
+- Uso de recursos do Projeto que vai usar a biblioteca de código no android. Isso é uma das dificuldades que é provável que você vai encontrar. Nesses casos você tem que pegar os recursos por contexto. Ex: `context.getResources().getIdentifier("app_id", "drawable", context.getPackageName());` e `Context context = getApplicationContext();`.
 
-- O projeto também precisava de abrir atividade do background. E para isso era necessário acessar código fonte do nativo android do projeto, para isso pegamos o nome do pacote `String here = getApplicationContext().getPackageName();` e com o nome do pacote pegavamos a classe `Class.forName(here + ".MainActivity")` e com ela chamei o intent `Intent mainIntent = new Intent(this, Class.forName(here + ".MainActivity"));` e com esse acesso ao intent fazemos as ouras operações.
+- O projeto também precisava de abrir atividade do background. E para isso era necessário acessar código fonte do nativo android do projeto, para isso pegamos o nome do pacote `String here = getApplicationContext().getPackageName();` e com o nome do pacote pegamos a classe `Class.forName(here + ".MainActivity")` e com ela chamei o intent `Intent mainIntent = new Intent(this, Class.forName(here + ".MainActivity"));` e com esse acesso ao intent fazemos as outras operações.
 
 - Certos códigos no android precisam de ser referenciados pelo Manifest, no caso do que eu fiz, eu usei um serviço e precisei de adicionar o mesmo. `<service android:name="package.name.Service" />`
 
 - Os caminhos e paths devem sempre ser coerentes com package, caso contrário pode prejudicar achar classes e compilar.
 #### 3.2.2 iOS
 
-- Em ios na hora de remover o código do projeto que já possuia ele, deu muito erro com o Auth Mach-O Linker, foi deletando o que podia pelo xcode e depois `pod deintegrate` e `pod install`, e dando *clean* no projeto, até corrigir o que precisava, além de tbm usar o `react-native link`.
+- Em ios na hora de remover o código do projeto que já possuía ele, deu muito erro com o Auth Mach-O Linker, foi deletando o que podia pelo xcode e depois `pod deintegrate` e `pod install`, e dando *clean* no projeto, até corrigir o que precisava, além de também usar o `react-native link`.
 
 - Como era usado código swift no nativo de ios foi necessário usar de uma biblioteca chamada *react-native-swift* e rodar `react-native swiftify` to link correctly to ios.
 
 - E também, por usar swift como mencionado acima, tive de alterar o podspec para adicionar o podfile para o local do código considerando raiz da pasta do package e colocar os arquivos .h,.m e swift,   `s.source_files  = "ios/**/*.{h,m,swift}"`.
   
-- Não esquecer de colocar `package = JSON.parse(File.read(File.join(__dir__, 'package.json')))` no inicio do podspec.
+- Não esquecer de colocar `package = JSON.parse(File.read(File.join(__dir__, 'package.json')))` no início do podspec.
 
-- Mudar os podfiles do que você está usando para o podspec da blibioteca ao ínvez do podfile.
+- Mudar os podfiles do que você está usando para o podspec da biblioteca ao invés do podfile.
 ### 3.3. Dicas
 
-- Esse tipo de migração toma tempo e requer que o projeto sejá rehomologado, faça isso com paciência e espaço para erros e experimentação.
+- Esse tipo de migração toma tempo e requer que o projeto seja homologado, faça isso com paciência e espaço para erros e experimentação.
   
-- Use um IDE de preferência o Android Studio que vai ajudar importar o que faltar em mudanças.
+- Use um IDE de preferência o Android Studio que vai ajudar a importar o que faltar em mudanças.
   
-- É uma boa oportunidade para retestar o seu projeto e verificar falhas , testar em versões antigas de android e apis. Afinal grande parte dos usuarios não usam sistemas mais recentes.
+- É uma boa oportunidade para testar o seu projeto e verificar falhas , testar em versões antigas de android e apis. Afinal, grande parte dos usuários não usam sistemas mais recentes.
   
-- Prioritariamente é melhor que sejá documentado seu código. Afinal não adianta você ter um código sem comentários e explicações para reutilizar e compartilhar em outros projetos. Se as pessoas não entenderem o seu código podem acabar é quebrando ele, então talvez sejá melhor comentar o código primeiro.
+- Prioritariamente é melhor que seja documentado seu código. Afinal, não adianta você ter um código sem comentários e explicações para reutilizar e compartilhar em outros projetos. Se as pessoas não entenderem o seu código podem acabar se quebrando ele, então talvez seja melhor comentar o código primeiro.
   
-- Procure uma blibioteca que tenha código nativo e estude um poquinho como ela faz X,Y e Z. Afinal uma base comparativa sempre ajuda.
+- Procure uma biblioteca que tenha código nativo e estude um pouquinho como ela faz X,Y e Z. Afinal, uma base comparativa sempre ajuda.
 
-- Aprender a verificar se foi carregado corretamente os códigos da sua blibioteca para ir testando e debugando, no Android Studio é de um jeito e no XCode em outro. Pasta Development Pods no Xcode e no AndroidStudio nas pastas na raiz perto de app quando se abre tem tudo.
+- Aprender a verificar se foi carregado corretamente os códigos da sua biblioteca para ir testando e debugando, no Android Studio é de um jeito e no XCode em outro. Pasta Development Pods no Xcode e no Android Studio nas pastas na raiz perto de app quando se abre tem tudo.
   
 ## 1.4. Publicando no npm.
 
@@ -219,16 +218,16 @@ Após criado o repositório executar as seguintes instruções para sincronizar 
 `git commit -a -m "initial commit"` </br>
 `git push -u origin master`
 
-Caso sejá sucedido sem nenhum erro ficara atualizado o código no seu repositorio git.
+Caso seja sucedido sem nenhum erro ficará atualizado o código no seu repositório git.
 
 ### 4.1. Publicando componente
-Depois de desenvolvido e subido ao github, se você desejar instala-los e usa-los em outros projetos ( ou para que outros instalem ou usem ) ,que é o real intuito de se fazer isso, seus componentes devem ser publicados no registro de componentes do npm : *npm registry*.
+Depois de desenvolvido e subido ao github, se você desejar instalá-los e usá-los em outros projetos ( ou para que outros instalem ou usem ) ,que é o real intuito de se fazer isso, seus componentes devem ser publicados no registro de componentes do npm : *npm registry*.
 
 ### 4.2. npm registry
 
 O que é o *npm registry* ?
 
-Seria o equivalemente de um centro administrativo de registro de pacotes. Ele gerencia diversos plugins de incontaveis desenvolvedor ao redor do mundo para que esses pacotes sejam instalados pelo npm install. Pensa nisso como um cartório usado para concentrar todos os dados de pacotes , kkk , ou não também. Precisou de saber algo ou ter acesso a um documento ( pacote ) deve consultar no cartório. É próximo mesmo que não sejá a mesma coisa.
+Seria o equivalente de um centro administrativo de registro de pacotes. Ele gerencia diversos plugins de incontáveis desenvolvedores ao redor do mundo para que esses pacotes sejam instalados pelo npm install. Pensa nisso como um cartório usado para concentrar todos os dados de pacotes , kkk , ou não também. Precisou de saber algo ou ter acesso a um documento ( pacote ) que deve consultar no cartório. É próximo mesmo que não seja a mesma coisa.
 
 O site oficial do registro: http://registry.npmjs.org/
 
@@ -250,7 +249,7 @@ Ou se você já possui um usuário, logar no registro npm com:
 
 Formas de verificar se está logado e está tudo ok.
 
-Comando: `npm whoami` confirmar que logou.
+confirmar que logou, comando: `npm whoami` 
 
 Abra em seu browser https://npmjs.com/~username para averiguar o registro/criação do novo usuário.
 
@@ -258,17 +257,17 @@ Abra em seu browser https://npmjs.com/~username para averiguar o registro/criaç
 
 #### 4.3.1. gitignore e .npmignore
 
-Defina quais arquivos não são desejaveis de serem mantidos/atualizado/subido no github no seu .gitignore
+Defina quais arquivos não são desejáveis de serem mantidos/atualizado/subido no github no seu .gitignore
 
-Defina quais arquivos não são desejaveis de serem empacotados quando publicados em .npmignore
+Defina quais arquivos não são desejáveis de serem empacotados quando publicados em .npmignore
 
 ### 4.4. package.json
 
-O arquivo package.json define todas a informações de seu pacote publicado, incluindo informações como: nome, versão, autores, descrição, dependencias, e mais.
+O arquivo package.json define todas as informações de seu pacote publicado, incluindo informações como: nome, versão, autores, descrição, dependências, e mais.
 
-Tudo especifico para funcionamento de seu projeto será referido em seu package.json
+Tudo específico para funcionamento de seu projeto será referido em seu package.json
 
-exemplo do que foi criado nesse tutorial:
+exemplo do que foi criado neste tutorial:
 
 ```````package.json
 {
@@ -299,7 +298,7 @@ O README.md é o arquivo que funciona como documento explicando como o pacote de
 ## 5. Lançamento
 
 Assim que estiver tudo pronto já se pode publicar.
-As atualizações são diferentes da primeira publicação observe abaixo.
+As atualizações são diferentes da primeira publicação observada abaixo.
 
 ### 5.1. Primeiro Lançamento
 
@@ -315,7 +314,7 @@ https://www.npmjs.com/package/<package>
 
 Será preciso executar 2 comandos:
 
-`npm version <update_type>`
+`npm version <update_type>`</br>
 `npm publish`
 
 | update_type | scene                                                                                                                               | Version Number Rule                 | Give an example      |
@@ -333,3 +332,6 @@ Use 1.0.0 como a primeira versão publicada para evitar conflitos.
 - https://programmer.group/develop-your-own-react-native-component-and-publish-it-to-npm.html
 - https://medium.com/wix-engineering/creating-a-native-module-in-react-native-93bab0123e46
 - https://www.npmjs.com/package/create-react-native-app
+- https://codificar.com.br/
+- Stack Overflow
+- E o chefe Raphael Cangucu
