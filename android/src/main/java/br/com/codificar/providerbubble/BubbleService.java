@@ -470,28 +470,16 @@ public class BubbleService extends Service {
         return (int) Math.ceil(25 * getApplicationContext().getResources().getDisplayMetrics().density);
     }
 
+    /*
+    * Go to activity with package name on application context.
+    */
     private void chathead_click() {
 
-//
-//        Log.i("LOGGANDO AQUI", here);
-
-        goToActivity();
-
-    }
-
-    public static boolean minVersion(){
-        Log.e(TAG, "Device: "+ Build.VERSION.SDK_INT);
-        Log.e(TAG, "Min: "+ Build.VERSION_CODES.LOLLIPOP);
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
-    }
-
-
-    private void goToActivity() {
         try {
             String here = getApplicationContext().getPackageName();
             if (minVersion()) {
                 Intent mainIntent = new Intent(this, Class.forName(here + ".MainActivity"));
-                PendingIntent mainPIntent = PendingIntent.getActivity(this, 0,
+                PendingIntent mainPIntent = PendingIntent.getActivity(getApplicationContext(), 0,
                         mainIntent, 0);
                 mainIntent.setAction("android.intent.action.MAIN");
                 mainIntent.addCategory("android.intent.category.LAUNCHER");
@@ -508,8 +496,14 @@ public class BubbleService extends Service {
         catch (Exception e){
             e.printStackTrace();
         }
+
     }
 
+    public static boolean minVersion(){
+        Log.e(TAG, "Device: "+ Build.VERSION.SDK_INT);
+        Log.e(TAG, "Min: "+ Build.VERSION_CODES.LOLLIPOP);
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+    }
 
     private void chathead_longclick() {
         Log.d(TAG, "Into Bubble.chathead_longclick() ");
