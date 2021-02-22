@@ -1,7 +1,7 @@
 {
   "name": "react-native-provider-bubble",
   "version": "1.0.1",
-  "description": "",
+  "description": "blibioteca usada para concentrar o serviço background e bubble dos apps de logistica da Codificar",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,8 +9,8 @@
   "keywords": [
     "react-native"
   ],
-  "author": "",
-  "license": "",
+  "author": "Arthur Abeilice",
+  "license": "MIT",
   "peerDependencies": {
     "react-native": "^0.41.2"
   }
