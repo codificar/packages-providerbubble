@@ -241,11 +241,15 @@ Para publicar o seu componente no npm registry, você deve ser um usuário regis
 
 Para adicionar um novo usuário:
 
+
 `npm adduser`
+
 
 Ou se você já possui um usuário, logar no registro npm com:
 
+
 `npm login`
+
 
 Formas de verificar se está logado e está tudo ok.
 
