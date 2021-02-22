@@ -34,6 +34,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Date;
+import java.util.Calendar;
+
+import 	java.text.SimpleDateFormat;
+import 	java.text.DateFormat;
+
 
 import android.graphics.PixelFormat;
 import android.os.Build;
@@ -159,7 +165,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 
 							JSONObject ride = jsonArray.getJSONObject(0);
 							if (this.checkPingTime(ride.getString("datetime"), ride.getInt("time_left_to_respond"))) {
-								log.d("###","Com tempo");
+								Log.d("###","Com tempo");
 								handleMessage("ping", jsonLikeRedis.toString());
 							}else{
 								Log.d("###","Sem Tempo Irmão");
@@ -469,7 +475,10 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		}
 	}
 
-	public boolean checkPingTime(String datetime, Integer timeLeft) {
+	/**
+	 * comparar os tempos para evitar fadiga de erro.
+	 */
+	public boolean checkPingTime(String datetime) {
 		try {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH🇲🇲ss");
 			Date date = new Date();
@@ -481,20 +490,24 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 
 			Date dateNow = c.getTime();
 
-			Log.d("###now", dateNow.toString());
+			Log.d("### now", dateNow.toString());
+
+			Log.d("### parse", datetime);
 
 			Date dateSend = dateFormat.parse(datetime);
 
 			c.setTime(dateSend);
-			c.add(Calendar.SECOND, timeLeft);
 
 			Date newDateSend = c.getTime();
+
+			Log.d("### not now", newDateSend.toString());
 
 			if (newDateSend.compareTo(dateNow) > 0) {
 				return true;
 			} else {
 				return false;
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
