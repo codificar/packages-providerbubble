@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.version      = "1.0.0"
   s.summary      = "RNProviderBubble"
   s.description  = "Bubble and Redis package used on logistic apps from codificar"
-  s.homepage     = "."
+  s.homepage     = "https://git.codificar.com.br/packages/providerbubble"
   s.license      = "MIT"
   # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
   s.author             = { "author" => "author@domain.cn" }
