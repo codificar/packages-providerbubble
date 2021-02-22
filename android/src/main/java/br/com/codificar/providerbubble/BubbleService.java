@@ -431,15 +431,20 @@ public class BubbleService extends Service {
             WindowManager.LayoutParams mParams = (WindowManager.LayoutParams) chatHead.getLayoutParams();
 
             public void onTick(long t) {
-                long step = (500 - t) / 5;
-                if(windowManager != null)
-                    windowManager.updateViewLayout(chatHead, mParams);
+                try {
+                    long step = (500 - t) / 5;
+                    if(windowManager != null)
+                        windowManager.updateViewLayout(chatHead, mParams);
+                }
+                catch(Exception ex){
+                    ex.printStackTrace();
+                }
             }
 
             public void onFinish() {
                 mParams.x = 0;
                 if(windowManager != null)
-                windowManager.updateViewLayout(chatHead, mParams);
+                    windowManager.updateViewLayout(chatHead, mParams);
             }
         }.start();
     }
