@@ -156,7 +156,14 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 						if (jsonArray.length() > 0 ) {
 							JSONObject jsonLikeRedis = new JSONObject();
 							jsonLikeRedis.put("data", jsonObject);
-							handleMessage("ping", jsonLikeRedis.toString());
+
+							JSONObject ride = jsonArray.getJSONObject(0);
+							if (this.checkPingTime(ride.getString("datetime"), ride.getInt("time_left_to_respond"))) {
+								log.d("###","Com tempo");
+								handleMessage("ping", jsonLikeRedis.toString());
+							}else{
+								Log.d("###","Sem Tempo Irmão");
+							}
 
 						}
 					}
@@ -461,5 +468,38 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			this.getReactApplicationContext().stopService(intent);
 		}
 	}
+
+	public boolean checkPingTime(String datetime, Integer timeLeft) {
+		try {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH🇲🇲ss");
+			Date date = new Date();
+
+			// Problema no timezone
+			Calendar c = Calendar.getInstance();
+			c.setTime(date);
+			c.add(Calendar.HOUR, -1);
+
+			Date dateNow = c.getTime();
+
+			Log.d("###now", dateNow.toString());
+
+			Date dateSend = dateFormat.parse(datetime);
+
+			c.setTime(dateSend);
+			c.add(Calendar.SECOND, timeLeft);
+
+			Date newDateSend = c.getTime();
+
+			if (newDateSend.compareTo(dateNow) > 0) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 
 }
