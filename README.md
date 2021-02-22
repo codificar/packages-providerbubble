@@ -28,8 +28,13 @@ Seu projeto precisa ter na parte nativa android no values/strings.xml os seguint
 <string name="over_other_apps_message">Essa permissão é importante para que você possa usar todas as funcionalidades do app.</string>
    
 `````
-
 imagem do mipmap deve chamar ic_launcher.
+
+imagem de drawable app_bubble_service app_bubble_default
+
+adição ao manifest de : 
+<service android:name="br.com.codificar.providerbubble.BubbleService" />
+
 
 ## Getting started
 
@@ -64,12 +69,11 @@ imagem do mipmap deve chamar ic_launcher.
       compile project(':react-native-provider-bubble')
   	```
 
-
 ## Usage
 ```javascript
 import RNProviderBubble from 'react-native-provider-bubble';
 
-// TODO: What to do with the module?
+// TODO: What to do with the module? Não sei so empacotei.
 RNProviderBubble;
 ```
   
