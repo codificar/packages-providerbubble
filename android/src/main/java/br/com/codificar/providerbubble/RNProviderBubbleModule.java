@@ -133,9 +133,13 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 
 				requestQueue.add(new VolleyHttpRequest(Method.POST, map, TOGGLE, this, null));
 			}
+
+			if (timerPing != null) {
+				timerPing.cancel();
+			}
 		}
 		catch (Exception ex){
-			//Log.d("onHostDestroy:ex", ex.getMessage());
+			ex.printStackTrace();
 		}
 	}
 
@@ -229,19 +233,18 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	private class TimerPingProvider extends TimerTask {
 		@Override
 		public void run() {
-			Log.d("TimerPingProvider:", "Running bubble reconect");
 			try {
 				postPing();
 			}
 			catch (Exception ex){
-				Log.d("TimerPingProvider:ping", ex.getMessage());
+				ex.printStackTrace();
 			}
 
 			try {
 				subRedis();
 			}
 			catch (Exception ex){
-				Log.d("TimerPingProvider:redis", ex.getMessage());
+				ex.printStackTrace();
 			}
 
 		
@@ -432,7 +435,10 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	}
 
 	public static void emitShowOverAppsAlert(){
-		emitDeviceEvent("emitShowOverAppsAlert", null);
+		WritableMap map = Arguments.createMap();
+		map.putBoolean("result",true);
+		emitDeviceEvent("emitShowOverAppsAlert", map);
+		// emitDeviceEvent("emitShowOverAppsAlert", null);
 	}
 
 	public static void emitCanDrawOverlays(){
