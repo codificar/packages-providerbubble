@@ -16,6 +16,11 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -164,7 +169,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 							jsonLikeRedis.put("data", jsonObject);
 
 							JSONObject ride = jsonArray.getJSONObject(0);
-							if (this.checkPingTime(ride.getString("accept_datetime_limit"))) {
+							if (this.checkPingTime(ride.getString("accept_datetime_limit"), ride.getString("timezone"))) {
 								Log.d("###","Com tempo");
 								handleMessage("ping", jsonLikeRedis.toString());
 							}else{
@@ -475,39 +480,23 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		}
 	}
 
-	/**
-	 * comparar os tempos para evitar fadiga de erro.
-	 */
-	public boolean checkPingTime(String datetime) {
+	@RequiresApi(api = Build.VERSION_CODES.O)
+	public boolean checkPingTime(String datetime, String serverTimezone) {
 		try {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			Date date = new Date();
+			Instant nowUtc = Instant.now();
+			ZoneId timezone = ZoneId.of(serverTimezone);
 
-			// Problema no timezone
-			Calendar c = Calendar.getInstance();
-			c.setTime(date);
-			c.add(Calendar.HOUR, -1);
+			ZonedDateTime now     = ZonedDateTime.ofInstant(nowUtc, timezone);
+			ZonedDateTime timeToCompare = ZonedDateTime.parse(datetime);
 
-			Date dateNow = c.getTime();
+			Log.d("###now", now.toString());
+			Log.d("###timeToCompare", timeToCompare.toString());
 
-			Log.d("### now", dateNow.toString());
-
-			Log.d("### parse", datetime);
-
-			Date dateSend = dateFormat.parse(datetime);
-
-			c.setTime(dateSend);
-
-			Date newDateSend = c.getTime();
-
-			Log.d("### not now", newDateSend.toString());
-
-			if (newDateSend.compareTo(dateNow) > 0) {
+			if (now.isBefore(timeToCompare)) {
 				return true;
 			} else {
 				return false;
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
