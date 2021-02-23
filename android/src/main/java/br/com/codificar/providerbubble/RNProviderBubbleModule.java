@@ -164,7 +164,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 							jsonLikeRedis.put("data", jsonObject);
 
 							JSONObject ride = jsonArray.getJSONObject(0);
-							if (this.checkPingTime(ride.getString("datetime"), ride.getInt("time_left_to_respond"))) {
+							if (this.checkPingTime(ride.getString("accept_datetime_limit"))) {
 								Log.d("###","Com tempo");
 								handleMessage("ping", jsonLikeRedis.toString());
 							}else{
@@ -480,7 +480,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	 */
 	public boolean checkPingTime(String datetime) {
 		try {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH🇲🇲ss");
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date date = new Date();
 
 			// Problema no timezone
