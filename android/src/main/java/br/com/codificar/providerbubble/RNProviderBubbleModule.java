@@ -280,6 +280,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		HashMap<String, String> map = new HashMap<>();
 			map.put("url", pingURL);
 			map.put("id", id);
+			map.put("provider_id", id);
 			map.put("token", token);
 
 		if(requestQueue == null)

@@ -15,7 +15,11 @@
 
 - `rm -rf node_modules && yarn install && yarn android`
 
+tem que rodar
 
+yarn add react-native-swift
+
+react-native swiftify
 ## Pre Requisitos 
 
 Seu projeto precisa ter na parte nativa android no values/strings.xml os seguintes campos:
