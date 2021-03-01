@@ -73,7 +73,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	private static final int PERMISSION_OVERLAY_SCREEN = 78;
 
 	private String id, token, status, changeStateURL, pingURL, redisURI, lastChannel;
-	private int pingSeconds = 30;
+	private int pingSeconds = 15;
 	private RequestQueue requestQueue;
 
 	private Timer timerPing ;
@@ -169,12 +169,12 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 							jsonLikeRedis.put("data", jsonObject);
 
 							JSONObject ride = jsonArray.getJSONObject(0);
-							if (this.checkPingTime(ride.getString("accept_datetime_limit"), ride.getString("timezone"))) {
-								Log.d("###","Com tempo");
-								handleMessage("ping", jsonLikeRedis.toString());
-							}else{
-								Log.d("###","Sem Tempo Irmão");
-							}
+							//if (this.checkPingTime(ride.getString("accept_datetime_limit"), ride.getString("timezone"))) {
+							//	Log.d("###","Com tempo");
+							handleMessage("ping", jsonLikeRedis.toString());
+							//}else{
+							//	Log.d("###","Sem Tempo Irmão");
+							//}
 
 						}
 					}
@@ -240,8 +240,14 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			this.redisURI = redisURI;
 			this.changeStateURL = changeStateURL;
 			this.pingURL = pingURL;
-			this.pingSeconds = Integer.parseInt(pingSeconds);
 			this.lastChannel = "construct";
+
+			try {
+				this.pingSeconds = Integer.parseInt(pingSeconds);
+			}
+			catch(Exception){
+				
+			}
 
 			startPingProvider();
 		}
@@ -481,28 +487,28 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		}
 	}
 
-	@RequiresApi(api = Build.VERSION_CODES.O)
-	public boolean checkPingTime(String datetime, String serverTimezone) {
-		try {
-			Instant nowUtc = Instant.now();
-			ZoneId timezone = ZoneId.of(serverTimezone);
+	// @RequiresApi(api = Build.VERSION_CODES.O)
+	// public boolean checkPingTime(String datetime, String serverTimezone) {
+	// 	try {
+	// 		Instant nowUtc = Instant.now();
+	// 		ZoneId timezone = ZoneId.of(serverTimezone);
 
-			ZonedDateTime now     = ZonedDateTime.ofInstant(nowUtc, timezone);
-			ZonedDateTime timeToCompare = ZonedDateTime.parse(datetime);
+	// 		ZonedDateTime now     = ZonedDateTime.ofInstant(nowUtc, timezone);
+	// 		ZonedDateTime timeToCompare = ZonedDateTime.parse(datetime);
 
-			Log.d("###now", now.toString());
-			Log.d("###timeToCompare", timeToCompare.toString());
+	// 		Log.d("###now", now.toString());
+	// 		Log.d("###timeToCompare", timeToCompare.toString());
 
-			if (now.isBefore(timeToCompare)) {
-				return true;
-			} else {
-				return false;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
+	// 		if (now.isBefore(timeToCompare)) {
+	// 			return true;
+	// 		} else {
+	// 			return false;
+	// 		}
+	// 	} catch (Exception e) {
+	// 		e.printStackTrace();
+	// 		return true;
+	// 	}
+	// }
 
 
 }

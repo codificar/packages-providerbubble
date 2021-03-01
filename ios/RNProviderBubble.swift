@@ -76,7 +76,7 @@ class RNProviderBubble: RCTEventEmitter{
 
   func startPingProvider() -> Void {
     
-    print("FIRE!!!")
+    // print("FIRE!!!")
     let semaphore = DispatchSemaphore(value: 0)
     
     if(RNProviderBubble.status == RNProviderBubble.ONLINE) {
@@ -90,9 +90,10 @@ class RNProviderBubble: RCTEventEmitter{
       let session = URLSession.shared
       let task = session.dataTask(with: request, completionHandler: { data, response, error -> Void in
         if error != nil {
-          debugPrint("DEBUG: Ping Provider")
+          debugPrint(error)
+          debugPrint("DEBUG: Ping Provider error")
         } else {
-          debugPrint("DEBUG: Ping Provider else")
+          debugPrint("DEBUG: Ping Provider ok")
         }
         semaphore.signal()
       })
