@@ -1,6 +1,6 @@
 {
   "name": "react-native-provider-bubble",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "blibioteca usada para concentrar o serviço background e bubble dos apps de logistica da Codificar",
   "main": "index.js",
   "scripts": {
