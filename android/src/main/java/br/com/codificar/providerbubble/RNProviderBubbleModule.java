@@ -16,11 +16,6 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -169,12 +164,12 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 							jsonLikeRedis.put("data", jsonObject);
 
 							JSONObject ride = jsonArray.getJSONObject(0);
-							//if (this.checkPingTime(ride.getString("accept_datetime_limit"), ride.getString("timezone"))) {
-							//	Log.d("###","Com tempo");
-							handleMessage("ping", jsonLikeRedis.toString());
-							//}else{
-							//	Log.d("###","Sem Tempo Irmão");
-							//}
+							if (this.checkPingTime(ride.getString("accept_datetime_limit"))) {
+								Log.d("###","Com tempo");
+								handleMessage("ping", jsonLikeRedis.toString());
+							}else{
+								Log.d("###","Sem Tempo Irmão");
+							}
 
 						}
 					}
@@ -487,28 +482,29 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		}
 	}
 
-	// @RequiresApi(api = Build.VERSION_CODES.O)
-	// public boolean checkPingTime(String datetime, String serverTimezone) {
-	// 	try {
-	// 		Instant nowUtc = Instant.now();
-	// 		ZoneId timezone = ZoneId.of(serverTimezone);
+	/**
+	 * Check time to handlerequest
+	 */
+	public boolean checkPingTime(String datetime) {
+	 	try {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	// 		ZonedDateTime now     = ZonedDateTime.ofInstant(nowUtc, timezone);
-	// 		ZonedDateTime timeToCompare = ZonedDateTime.parse(datetime);
+			Date date = new Date();
+			Date dateSend = dateFormat.parse(datetime.trim());
 
-	// 		Log.d("###now", now.toString());
-	// 		Log.d("###timeToCompare", timeToCompare.toString());
+	 		Log.d("###now", date.toString());
+	 		Log.d("###timeToCompare", dateSend.toString());
 
-	// 		if (now.isBefore(timeToCompare)) {
-	// 			return true;
-	// 		} else {
-	// 			return false;
-	// 		}
-	// 	} catch (Exception e) {
-	// 		e.printStackTrace();
-	// 		return true;
-	// 	}
-	// }
+	 		if (date.before(dateSend)) {
+	 			return true;
+	 		} else {
+	 			return false;
+	 		}
+	 	} catch (Exception e) {
+	 		e.printStackTrace();
+	 		return true;
+	 	}
+	}
 
 
 }
