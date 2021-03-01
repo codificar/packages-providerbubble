@@ -245,8 +245,8 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			try {
 				this.pingSeconds = Integer.parseInt(pingSeconds);
 			}
-			catch(Exception){
-				
+			catch(Exception ex){
+				ex.printStackTrace();
 			}
 
 			startPingProvider();
