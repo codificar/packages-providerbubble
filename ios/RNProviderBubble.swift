@@ -58,53 +58,73 @@ class RNProviderBubble: RCTEventEmitter{
     }
   }
   
-  @objc
-  func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String ) {
-    if(RNProviderBubble.id == nil || RNProviderBubble.id != id) {
-      RNProviderBubble.id = id;
-      RNProviderBubble.token = token;
-      RNProviderBubble.status = status;
-      RNProviderBubble.redisURI = redisURI;
-      RNProviderBubble.changeStateURL = changeStateURL;
-      RNProviderBubble.pingURL = pingURL;
-      RNProviderBubble.pingSeconds = Int(pingSeconds);
-      
-      startPingProvider()
+	@objc
+	func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String ) {
+		if(RNProviderBubble.id == nil || RNProviderBubble.id != id) {
+			RNProviderBubble.id = id;
+			RNProviderBubble.token = token;
+			RNProviderBubble.status = status;
+			RNProviderBubble.redisURI = redisURI;
+			RNProviderBubble.changeStateURL = changeStateURL;
+			RNProviderBubble.pingURL = pingURL;
+			RNProviderBubble.pingSeconds = Int(pingSeconds);
+			
+			startPingProvider()
+		}
+	}
 
-    }
-  }
+	func startPingProvider() -> Void {
+		
+		// print("FIRE!!!")
+		let semaphore = DispatchSemaphore(value: 0)
+		
+		if(RNProviderBubble.status == RNProviderBubble.ONLINE) {
+			debugPrint("DEBUG: Provider is exiting application online...")
+			let params = ["id":RNProviderBubble.id, "token":RNProviderBubble.token] as! Dictionary<String, String>
+			var request = URLRequest(url: URL(string: RNProviderBubble.pingURL!)!)
+			request.httpMethod = "POST"
+			request.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
+			request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+			
+			let session = URLSession.shared
+			let task = session.dataTask(with: request, completionHandler: { data, response, error -> Void in
+				if error != nil {
+				debugPrint(error)
+				debugPrint("DEBUG: Ping Provider error")
+				} else {
+					if let json = try? JSONSerialization.jsonObject(with: data!, options: [.allowFragments]) as! AnyObject {
+						debugPrint(json)
+						do{
+							let array = try json["incoming_requests"] as!  NSArray
+							if array.count > 0 {
+		//                        let jsonObject: [String: Any] = [
+		//                            "data": json
+		//                        ]
+								self.handleMessage(
+									channel: "ping",
+									message: RNProviderBubble.stringify( json: [
+										"data": json
+									])
+								); //Thread X: signal SIGABRT
+							}
+						}
+						catch{
+						}
+						
 
-  func startPingProvider() -> Void {
-    
-    // print("FIRE!!!")
-    let semaphore = DispatchSemaphore(value: 0)
-    
-    if(RNProviderBubble.status == RNProviderBubble.ONLINE) {
-      debugPrint("DEBUG: Provider is exiting application online...")
-      let params = ["id":RNProviderBubble.id, "token":RNProviderBubble.token] as! Dictionary<String, String>
-      var request = URLRequest(url: URL(string: RNProviderBubble.pingURL!)!)
-      request.httpMethod = "POST"
-      request.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
-      request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-      
-      let session = URLSession.shared
-      let task = session.dataTask(with: request, completionHandler: { data, response, error -> Void in
-        if error != nil {
-          debugPrint(error)
-          debugPrint("DEBUG: Ping Provider error")
-        } else {
-          debugPrint("DEBUG: Ping Provider ok")
-        }
-        semaphore.signal()
-      })
-      task.resume()
-      semaphore.wait()
-    }
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + DispatchTimeInterval.seconds(RNProviderBubble.pingSeconds)) {
-    self.startPingProvider()
-    }
-  }
+				}
+				debugPrint("DEBUG: Ping Provider ok")
+				}
+				semaphore.signal()
+			})
+			task.resume()
+			semaphore.wait()
+		}
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + DispatchTimeInterval.seconds(RNProviderBubble.pingSeconds)) {
+			self.startPingProvider()
+		}
+  	}
 
   @objc
   func canDrawOverlays(
