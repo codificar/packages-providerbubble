@@ -92,16 +92,12 @@ class RNProviderBubble: RCTEventEmitter{
 					if let json = try? JSONSerialization.jsonObject(with: data!, options: [.allowFragments]) as! AnyObject {
 						debugPrint(json)
 						do{
-							let array = try json["incoming_requests"] as!  NSArray
+							let array = json["incoming_requests"] as!  NSArray
 							if array.count > 0 {
-			//                        let jsonObject: [String: Any] = [
-			//                            "data": json
-			//                        ]
+
 								self.handleMessage(
 									channel: "ping",
-									message: RNProviderBubble.stringify( json: [
-										"data": json
-									])
+                                    message:  "{ \"data\" : " + RNProviderBubble.stringify(json: json) + "}"
 								); //Thread X: signal SIGABRT
 							}
 						}
@@ -126,6 +122,7 @@ class RNProviderBubble: RCTEventEmitter{
 		if prettyPrinted {
 			options = JSONSerialization.WritingOptions.prettyPrinted
 		}
+        
 
 		do {
 			let data = try JSONSerialization.data(withJSONObject: json, options: options)
@@ -138,6 +135,8 @@ class RNProviderBubble: RCTEventEmitter{
 
 		return ""
     }
+    
+    
 
   	@objc
   	func canDrawOverlays(

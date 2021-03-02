@@ -4,7 +4,7 @@ package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
   s.name         = "RNProviderBubble"
-  s.version      = "1.0.1"
+  s.version      = "1.0.6"
   s.summary      = "RNProviderBubble"
   s.description  = "Bubble and Redis package used on logistic apps from codificar"
   s.homepage     = "https://git.codificar.com.br/packages/providerbubble"
