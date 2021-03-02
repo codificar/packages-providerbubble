@@ -98,7 +98,7 @@ class RNProviderBubble: RCTEventEmitter{
 								self.handleMessage(
 									channel: "ping",
                                     message:  "{ \"data\" : " + RNProviderBubble.stringify(json: json) + "}"
-								); //Thread X: signal SIGABRT
+								); 
 							}
 						}
 						catch{
