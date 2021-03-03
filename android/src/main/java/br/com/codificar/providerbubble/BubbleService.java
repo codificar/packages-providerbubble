@@ -481,10 +481,10 @@ public class BubbleService extends Service {
     private void chathead_click() {
 
         try {
-            String here = getApplicationContext().getPackageName();
+            //String here = getApplicationContext().getPackageName();
             if (minVersion()) {
                 //+ ".MainActivity"
-                Intent mainIntent = new Intent(this, BubbleService.currentActivity );
+                Intent mainIntent = new Intent(this, BubbleService.currentActivity.getClass() );
                 PendingIntent mainPIntent = PendingIntent.getActivity(getApplicationContext(), 0,
                         mainIntent, 0);
                 mainIntent.setAction("android.intent.action.MAIN");
@@ -494,7 +494,7 @@ public class BubbleService extends Service {
                 mainPIntent.send();
 
             } else {
-                Intent intent = new Intent(this, BubbleService.currentActivity );
+                Intent intent = new Intent(this, BubbleService.currentActivity.getClass() );
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
