@@ -483,7 +483,8 @@ public class BubbleService extends Service {
         try {
             String here = getApplicationContext().getPackageName();
             if (minVersion()) {
-                Intent mainIntent = new Intent(this, Class.forName(here + ".MainActivity"));
+                //+ ".MainActivity"
+                Intent mainIntent = new Intent(this, BubbleService.currentActivity );
                 PendingIntent mainPIntent = PendingIntent.getActivity(getApplicationContext(), 0,
                         mainIntent, 0);
                 mainIntent.setAction("android.intent.action.MAIN");
@@ -493,7 +494,7 @@ public class BubbleService extends Service {
                 mainPIntent.send();
 
             } else {
-                Intent intent = new Intent(this, Class.forName(here + ".MainActivity"));
+                Intent intent = new Intent(this, BubbleService.currentActivity );
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
