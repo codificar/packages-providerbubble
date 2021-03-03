@@ -76,6 +76,8 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	private static final String ONLINE = "1";
 	private static final String OFFLINE = "0";
 	private static final String INCOMING_REQUESTS = "incoming_requests";
+	private static final String SUCCESS = "success";
+	private static final String ERROR_CODE = "error_code";
 	private static final int PING = 10;
 	private static final int TOGGLE = 10;
 
@@ -171,6 +173,16 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 								Log.d("###","Sem Tempo Irmão");
 							}
 
+						}
+					}
+
+					if (jsonObject.getBoolean(SUCCESS) == false && jsonObject.has(ERROR_CODE) && jsonObject.getInt(ERROR_CODE) == 406) {
+						this.toggleService(false);
+						RedisHandler.getInstance(this.redisURI, this)
+								.unsubscribePubSub("provider."+id);
+								
+						if (timerPing != null) {
+							timerPing.cancel();
 						}
 					}
 				} catch (JSONException e) {
