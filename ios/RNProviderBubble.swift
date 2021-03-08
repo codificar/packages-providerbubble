@@ -16,6 +16,7 @@ class RNProviderBubble: RCTEventEmitter{
 	static var changeStateURL: String?
 	static var pingURL: String?
 	static var pingSeconds: Int! = 0
+	static var receivedUrl: String?
 	static let ONLINE: String = "1"
 	static let OFFLINE: String = "0"
 	
@@ -57,7 +58,7 @@ class RNProviderBubble: RCTEventEmitter{
   	}
   
 	@objc
-	func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String ) {
+	func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String, receivedUrl: String ) {
 		if(RNProviderBubble.id == nil || RNProviderBubble.id != id) {
 			RNProviderBubble.id = id;
 			RNProviderBubble.token = token;
@@ -66,6 +67,7 @@ class RNProviderBubble: RCTEventEmitter{
 			RNProviderBubble.changeStateURL = changeStateURL;
 			RNProviderBubble.pingURL = pingURL;
 			RNProviderBubble.pingSeconds = Int(pingSeconds);
+			RNProviderBubble.receivedUrl = receivedUrl;
 			
 			startPingProvider()
 
@@ -204,8 +206,17 @@ class RNProviderBubble: RCTEventEmitter{
 	* @param message the message received
 	*/
   	func handleMessage(channel: String, message: String) {
-		// TODO: verify if host is active?
-		sendEvent(withName: "handleRequest", body: ["data": message])
+        let acceptDatetime = self.getRideParameter(message: message, key: "accept_datetime_limit")
+        
+        if (acceptDatetime != "" && self.checkPingTime(datetime: acceptDatetime) == true) {
+            sendEvent(withName: "handleRequest", body: ["data": message])
+        }
+
+		let rideId = self.getRideParameter(message: message, key: "request_id")
+
+		if (rideId != "") {
+			self.postRequestReceived(channel: channel, request_id: rideId)
+		}
   	}
   
 	/**
@@ -228,4 +239,68 @@ class RNProviderBubble: RCTEventEmitter{
 			reject("ER_PUB", "Falied to publish message", error)
 		}
   	}
+
+	/**
+	 * Check time to handle request
+	 */
+	func checkPingTime(datetime: String) -> Bool {
+		let now = Date()
+
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        
+		let toCompare = dateFormatter.date(from:datetime.trimmingCharacters(in: .whitespacesAndNewlines))!
+        debugPrint(now)
+        debugPrint(toCompare)
+		return (now < toCompare)
+	}
+
+	/**
+	 * Get ride parameter by key
+	 */
+    func getRideParameter(message: String, key: String) -> String {
+		let data = Data(message.utf8)
+
+		do {
+			// make sure this JSON is in the format we expect
+			if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]{
+				// try to read out a string array
+				let rideData = json["data"] as! [String: Any]
+				let incRequests = rideData["incoming_requests"]  as! [Any]
+				let rideObj = incRequests[0] as! [String: Any]
+
+				if (key == "request_id") {
+					let rideId = rideObj[key] as! Int
+					return String(rideId)
+				}
+				
+				return rideObj[key] as! String
+			}
+		} catch let error as NSError {
+			print("Failed to load: \(error.localizedDescription)")
+		}
+
+		return ""
+	}
+
+	/**
+	 * Notifying the server that the request has been received
+	 */
+	func postRequestReceived(channel: String, request_id: String) -> Void {
+		let params = ["provider_id":RNProviderBubble.id, "token":RNProviderBubble.token, "request_id": request_id, "channel": channel] as! Dictionary<String, String>
+		var request = URLRequest(url: URL(string: RNProviderBubble.receivedUrl!)!)
+		request.httpMethod = "POST"
+		request.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
+		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+		let session = URLSession.shared
+		let task = session.dataTask(with: request, completionHandler: { data, response, error -> Void in
+			if error != nil {
+				debugPrint("DEBUG: postRequestReceived error")
+			} else {
+				debugPrint("DEBUG: postRequestReceived success")
+			}
+		})
+		task.resume()
+	}
 }
