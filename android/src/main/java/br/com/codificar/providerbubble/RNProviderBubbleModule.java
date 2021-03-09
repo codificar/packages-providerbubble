@@ -67,7 +67,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	private static ReactApplicationContext reactContext = null;
 	private static final int PERMISSION_OVERLAY_SCREEN = 78;
 
-	private String id, token, status, changeStateURL, pingURL, redisURI, lastChannel;
+	private String id, token, status, changeStateURL, pingURL, redisURI, lastChannel, receivedUrl;
 	private int pingSeconds = 15;
 	private RequestQueue requestQueue;
 
@@ -76,8 +76,12 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	private static final String ONLINE = "1";
 	private static final String OFFLINE = "0";
 	private static final String INCOMING_REQUESTS = "incoming_requests";
+	private static final String DATA = "data";
+	private static final String ACCEPT_DATETIME_LIMIT = "accept_datetime_limit";
+	private static final String REQUEST_ID = "request_id";
 	private static final int PING = 10;
 	private static final int TOGGLE = 10;
+	private static final int RECEIVED = 11;
 
 	private static boolean hostActive;
 	private static String requestData;
@@ -163,14 +167,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 							JSONObject jsonLikeRedis = new JSONObject();
 							jsonLikeRedis.put("data", jsonObject);
 
-							JSONObject ride = jsonArray.getJSONObject(0);
-							if (this.checkPingTime(ride.getString("accept_datetime_limit"))) {
-								Log.d("###","Com tempo");
-								handleMessage("ping", jsonLikeRedis.toString());
-							}else{
-								Log.d("###","Sem Tempo Irmão");
-							}
-
+							handleMessage("ping", jsonLikeRedis.toString());
 						}
 					}
 				} catch (JSONException e) {
@@ -179,7 +176,8 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 
 				Log.d("PING", response);
 				break;
-
+			case RECEIVED:
+				Log.d("RECEIVED", response);
 			default:
 				break;
 		}
@@ -226,8 +224,8 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		}
 	}
 
-@ReactMethod
-	public void setupProviderContext(String id, String token, String status, String redisURI, String changeStateURL, String pingURL, String pingSeconds) {
+	@ReactMethod
+	public void setupProviderContext(String id, String token, String status, String redisURI, String changeStateURL, String pingURL, String pingSeconds, String receivedUrl) {
 		if(this.id == null || this.id != id) {
 			this.id = id;
 			this.token = token;
@@ -236,6 +234,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			this.changeStateURL = changeStateURL;
 			this.pingURL = pingURL;
 			this.lastChannel = "construct";
+			this.receivedUrl = receivedUrl;
 
 			try {
 				this.pingSeconds = Integer.parseInt(pingSeconds);
@@ -305,24 +304,27 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 
 	/**
 	 * Handle messages received by pubSub Redis client
-	 * 
+	 *
 	 * @param channel the Redis PubSub subscribed cannel
 	 * @param message the message received
 	 */
 	public void handleMessage(String channel, String message) {
-		lastChannel = channel;
-		// TODO: if(channel.startsWith("provider"))
+		if (this.checkPingTime(this.getRideParameter(message, ACCEPT_DATETIME_LIMIT))) {
+			Log.d("###", "Com tempo");
 
-		BubbleService.startRequestBubble(getReactApplicationContext(), 2);
-		
-		emitRequest(channel ,message);
-		
-		// TODO: else if(channel.startsWith("request")) 
+			lastChannel = channel;
+			BubbleService.startRequestBubble(getReactApplicationContext(), 2);
+			emitRequest(channel ,message);
+		} else {
+			Log.d("###", "Sem tempo");
+		}
+
+		this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
 	}
 
 	/**
 	 * Emit the request to the react-native module
-	 * 
+	 *
 	 * @param request the new service request
 	 */
 	public static void emitRequest(String channel, String request) {
@@ -422,9 +424,9 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	}
 
 	/**
-	* Workaround for Android O
-	* https://stackoverflow.com/a/46174872
-	*/
+	 * Workaround for Android O
+	 * https://stackoverflow.com/a/46174872
+	 */
 	public static boolean canDrawOverlays(Context context) {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
 		else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -484,28 +486,102 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	}
 
 	/**
-	 * Check time to handlerequest
+	 * Check time to handle request
+	 *
+	 * @param datetime
 	 */
 	public boolean checkPingTime(String datetime) {
-	 	try {
+		try {
+			if (datetime == "")
+				return false;
+
 			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 			Date date = new Date();
 			Date dateSend = dateFormat.parse(datetime.trim());
 
-	 		Log.d("###now", date.toString());
-	 		Log.d("###timeToCompare", dateSend.toString());
+			Log.d("###now", date.toString());
+			Log.d("###timeToCompare", dateSend.toString());
 
-	 		if (date.before(dateSend)) {
-	 			return true;
-	 		} else {
-	 			return false;
-	 		}
-	 	} catch (Exception e) {
-	 		e.printStackTrace();
-	 		return true;
-	 	}
+			if (date.before(dateSend)) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return true;
+		}
 	}
 
+	/**
+	 * Get a ride parameter by key
+	 *
+	 * @param message
+	 * @param key
+	 */
+	public String getRideParameter(String message, String key) {
+		String parameter = "";
 
+		try {
+			JSONObject ride = this.parseRide(message);
+
+			if (ride != null) {
+				return ride.getString(key);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return parameter;
+	}
+
+	/**
+	 * Parse ride string to JSONObject
+	 *
+	 * @param ride
+	 */
+	public JSONObject parseRide (String ride) {
+		JSONObject jsonObject = null;
+
+		try {
+			jsonObject = new JSONObject(ride);
+			JSONObject data = jsonObject.getJSONObject(DATA);
+			JSONArray jsonArray = data.getJSONArray(INCOMING_REQUESTS);
+			if (jsonArray.length() > 0 ) {
+				return jsonArray.getJSONObject(0);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return jsonObject;
+	}
+
+	/**
+	 * Notifying the server that the request has been received
+	 *
+	 * @param channel
+	 * @param request_id
+	 */
+	public void postReceived(String channel, String request_id) {
+		try {
+			if (request_id == "")
+				return;
+			
+			HashMap<String, String> map = new HashMap<>();
+			map.put("url", receivedUrl);
+			map.put("provider_id", id);
+			map.put("token", token);
+			map.put("request_id", request_id);
+			map.put("channel", channel);
+
+			if(requestQueue == null)
+				requestQueue = Volley.newRequestQueue(Objects.requireNonNull(getCurrentActivity()));
+
+			requestQueue.add(new VolleyHttpRequest(Method.POST, map, RECEIVED, this, null));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
