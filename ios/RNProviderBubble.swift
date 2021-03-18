@@ -102,7 +102,7 @@ class RNProviderBubble: RCTEventEmitter{
                                         message:  "{ \"data\" : " + RNProviderBubble.stringify(json: json) + "}"
                                     );
                                 }
-                            }s
+                            }
 						}
 						catch{
 						}
