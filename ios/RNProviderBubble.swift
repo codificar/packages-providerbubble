@@ -94,13 +94,16 @@ class RNProviderBubble: RCTEventEmitter{
 					if let json = try? JSONSerialization.jsonObject(with: data!, options: [.allowFragments]) as! AnyObject {
 						debugPrint(json)
 						do{
-							let array = json["incoming_requests"] as!  NSArray
-							if array.count > 0 {
+							if let array = json["incoming_requests"] as!  NSArray{
+								if array.count > 0 {
 
-								self.handleMessage(
-									channel: "ping",
-                                    message:  "{ \"data\" : " + RNProviderBubble.stringify(json: json) + "}"
-								); 
+									self.handleMessage(
+										channel: "ping",
+										message:  "{ \"data\" : " + RNProviderBubble.stringify(json: json) + "}"
+									); 
+								}
+							}else{
+								debugPrint("DEBUG: incoming request is nil as []")
 							}
 						}
 						catch{
