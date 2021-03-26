@@ -249,11 +249,15 @@ class RNProviderBubble: RCTEventEmitter{
 
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        
-		let toCompare = dateFormatter.date(from:datetime.trimmingCharacters(in: .whitespacesAndNewlines))!
-        debugPrint(now)
-        debugPrint(toCompare)
-		return (now < toCompare)
+
+        if  dateFormatter.date(from:datetime.trimmingCharacters(in: .whitespacesAndNewlines)) != nil {
+            let toCompare = dateFormatter.date(from:datetime.trimmingCharacters(in: .whitespacesAndNewlines))!
+            debugPrint(now)
+            debugPrint(toCompare)
+            return (now < toCompare)
+        } else {
+            return true
+        }
 	}
 
 	/**
