@@ -114,10 +114,16 @@ class RNProviderBubble: RCTEventEmitter{
 			task.resume()
 			semaphore.wait()
 		}
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + DispatchTimeInterval.seconds(RNProviderBubble.pingSeconds)) {
-			self.startPingProvider()
+		if RNProviderBubble.pingSeconds != nil {
+			DispatchQueue.main.asyncAfter(deadline: .now() + DispatchTimeInterval.seconds(RNProviderBubble.pingSeconds)) {
+				self.startPingProvider()
+			}
+		}else{
+			DispatchQueue.main.asyncAfter(deadline: .now() + DispatchTimeInterval.seconds(3)) {
+				self.startPingProvider()
+			}
 		}
+
 	}
     
     static func stringify(json: Any, prettyPrinted: Bool = false) -> String {
@@ -175,10 +181,12 @@ class RNProviderBubble: RCTEventEmitter{
     	rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
 		do {
-			let channel = "provider." + RNProviderBubble.id!;
-			try RedisHandler.getInstance(redisURI: RNProviderBubble.redisURI!, module: self).unsubscribePubSub(channel: channel)
-			RNProviderBubble.status = RNProviderBubble.OFFLINE
-			resolve("Successfully unsubscribed")
+			if(RNProviderBubble.id != nil){
+				let channel = "provider." + RNProviderBubble.id!;
+				try RedisHandler.getInstance(redisURI: RNProviderBubble.redisURI!, module: self).unsubscribePubSub(channel: channel)
+				RNProviderBubble.status = RNProviderBubble.OFFLINE
+				resolve("Successfully unsubscribed")
+			}
 		} catch {
 			reject("ER_UNSUB", "Failed to unsubscribe", error)
 		}
