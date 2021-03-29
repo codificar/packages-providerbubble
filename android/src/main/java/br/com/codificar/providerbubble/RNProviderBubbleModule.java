@@ -66,6 +66,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	public static final String REACT_CLASS = "RNProviderBubble";
 	private static ReactApplicationContext reactContext = null;
 	private static final int PERMISSION_OVERLAY_SCREEN = 78;
+	private sattic String status;
 
 	private String id, token, status, changeStateURL, pingURL, redisURI, lastChannel, receivedUrl;
 	private int pingSeconds = 15;
@@ -248,6 +249,24 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		}
 	}
 
+	@ReactMethod
+	public void setupProviderContextClear() {
+		try{
+			RedisHandler.getInstance(this.redisURI, this)
+			.unsubscribePubSub("provider."+this.id);
+			this.id = "";
+			this.token = "";
+			this.status = OFFLINE;
+			this.redisURI = "";
+			this.changeStateURL = "";
+
+
+		}
+		catch( Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	// timer de checagem de status de corrida atual
 	private class TimerPingProvider extends TimerTask {
 		@Override
@@ -328,10 +347,12 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	 * @param request the new service request
 	 */
 	public static void emitRequest(String channel, String request) {
-		WritableMap map = Arguments.createMap();
-		map.putString("channel", channel);
-		map.putString("data", request);
-		emitDeviceEvent("handleRequest", map);
+		if(status.equals(ONLINE)){
+			WritableMap map = Arguments.createMap();
+			map.putString("channel", channel);
+			map.putString("data", request);
+			emitDeviceEvent("handleRequest", map);
+		}
 	}
 
 	@ReactMethod

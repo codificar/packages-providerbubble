@@ -24,5 +24,8 @@ export default {
 	},
 	canDrawOverlays (){
 		return RNProviderBubble.canDrawOverlays()
+	},
+	setupProviderContextClear(){
+		return RNProviderBubble.setupProviderContextClear()
 	}
 }
