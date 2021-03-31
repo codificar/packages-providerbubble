@@ -177,6 +177,19 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 				Log.d("PING", response);
 				break;
 			case RECEIVED:
+				JSONObject jsonObjectReceived = null;
+
+				try {
+					jsonObjectReceived = new JSONObject(response);
+
+					if (jsonObjectReceived.has("time_error")) {
+						if (jsonObjectReceived.getBoolean("time_error") == true)
+							emitWrongDateTime();
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
 				Log.d("RECEIVED", response);
 			default:
 				break;
@@ -595,6 +608,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			map.put("token", token);
 			map.put("request_id", request_id);
 			map.put("channel", channel);
+			map.put("device_date", this.getDeviceCurrentDate());
 
 			if(requestQueue == null)
 				requestQueue = Volley.newRequestQueue(Objects.requireNonNull(getCurrentActivity()));
@@ -603,5 +617,30 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Get device current date
+	 */
+	public String getDeviceCurrentDate() {
+		try {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date date = new Date();
+			String dateNow = dateFormat.format(date);
+
+			return dateNow;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
+
+	/**
+	 * Emit wrong date time event
+	 */
+	public static void emitWrongDateTime() {
+		WritableMap map = Arguments.createMap();
+		map.putBoolean("time_error", true);
+		emitDeviceEvent("deviceWrongDate", map);
 	}
 }
