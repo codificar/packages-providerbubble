@@ -66,7 +66,6 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	public static final String REACT_CLASS = "RNProviderBubble";
 	private static ReactApplicationContext reactContext = null;
 	private static final int PERMISSION_OVERLAY_SCREEN = 78;
-	private sattic String status;
 
 	private String id, token, status, changeStateURL, pingURL, redisURI, lastChannel, receivedUrl;
 	private int pingSeconds = 15;
@@ -333,7 +332,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 
 			lastChannel = channel;
 			BubbleService.startRequestBubble(getReactApplicationContext(), 2);
-			emitRequest(channel ,message);
+			emitRequest(channel ,message, status.equals(ONLINE));
 		} else {
 			Log.d("###", "Sem tempo");
 		}
@@ -346,8 +345,8 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	 *
 	 * @param request the new service request
 	 */
-	public static void emitRequest(String channel, String request) {
-		if(status.equals(ONLINE)){
+	public static void emitRequest(String channel, String request, Boolean isOnline) {
+		if(isOnline == true){
 			WritableMap map = Arguments.createMap();
 			map.putString("channel", channel);
 			map.putString("data", request);
