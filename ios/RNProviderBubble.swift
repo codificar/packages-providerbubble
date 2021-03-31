@@ -22,7 +22,7 @@ class RNProviderBubble: RCTEventEmitter{
 	
 	// Array of event names that we can listen to
 	override func supportedEvents() -> [String]! {
-		return ["handleRequest"]
+		return ["handleRequest", "deviceWrongDate"]
 	}
 	
 	// true if the class must be initialized on the main thread
@@ -36,7 +36,7 @@ class RNProviderBubble: RCTEventEmitter{
 		// Set provider offline before app is killed
 		if(RNProviderBubble.status == RNProviderBubble.ONLINE) {
 			debugPrint("DEBUG: Provider is exiting application online...")
-			let params = ["id":RNProviderBubble.id, "token":RNProviderBubble.token] as! Dictionary<String, String>
+			let params = ["provider_id":RNProviderBubble.id, "id":RNProviderBubble.id, "token":RNProviderBubble.token] as! Dictionary<String, String>
 			var request = URLRequest(url: URL(string: RNProviderBubble.changeStateURL!)!)
 			request.httpMethod = "POST"
 			request.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
@@ -79,7 +79,7 @@ class RNProviderBubble: RCTEventEmitter{
 		let semaphore = DispatchSemaphore(value: 0)
 		if(RNProviderBubble.status == RNProviderBubble.ONLINE) {
 			debugPrint("DEBUG: Provider is exiting application online...")
-			let params = ["id":RNProviderBubble.id, "token":RNProviderBubble.token] as! Dictionary<String, String>
+			let params = ["provider_id":RNProviderBubble.id, "id":RNProviderBubble.id, "token":RNProviderBubble.token] as! Dictionary<String, String>
 			var request = URLRequest(url: URL(string: RNProviderBubble.pingURL!)!)
 			request.httpMethod = "POST"
 			request.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
@@ -300,7 +300,8 @@ class RNProviderBubble: RCTEventEmitter{
 	 * Notifying the server that the request has been received
 	 */
 	func postRequestReceived(channel: String, request_id: String) -> Void {
-		let params = ["provider_id":RNProviderBubble.id, "token":RNProviderBubble.token, "request_id": request_id, "channel": channel] as! Dictionary<String, String>
+		let deviceDate = self.getDeviceCurrentDate()
+		let params = ["provider_id":RNProviderBubble.id, "token":RNProviderBubble.token, "request_id": request_id, "channel": channel, "device_date": deviceDate] as! Dictionary<String, String>
 		var request = URLRequest(url: URL(string: RNProviderBubble.receivedUrl!)!)
 		request.httpMethod = "POST"
 		request.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
@@ -312,8 +313,37 @@ class RNProviderBubble: RCTEventEmitter{
 				debugPrint("DEBUG: postRequestReceived error")
 			} else {
 				debugPrint("DEBUG: postRequestReceived success")
+				if let json = try? JSONSerialization.jsonObject(with: data!, options: [.allowFragments]) as! AnyObject {
+					debugPrint(json)
+					do{
+						if let timeError = json["time_error"] as? Bool{
+							if (timeError == true) {
+								self.emitWrongDateTime()
+							}
+						}
+					}
+					catch{
+					}
+				}
 			}
 		})
 		task.resume()
+	}
+
+	/**
+	 * Get phone current date
+	 */
+	func getDeviceCurrentDate() -> String {
+		let now = Date()
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+		return dateFormatter.string(from: now)
+	}
+
+	/**
+	 * Emit event to warn wrong date
+	 */
+	func emitWrongDateTime() {
+		sendEvent(withName: "deviceWrongDate", body: [])
 	}
 }
