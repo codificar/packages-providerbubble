@@ -68,6 +68,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	private static final int PERMISSION_OVERLAY_SCREEN = 78;
 
 	private String id, token, status, changeStateURL, pingURL, redisURI, lastChannel, receivedUrl;
+	private boolean isCheckTimeEnabled;
 	private int pingSeconds = 15;
 	private RequestQueue requestQueue;
 
@@ -238,7 +239,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	}
 
 	@ReactMethod
-	public void setupProviderContext(String id, String token, String status, String redisURI, String changeStateURL, String pingURL, String pingSeconds, String receivedUrl) {
+	public void setupProviderContext(String id, String token, String status, String redisURI, String changeStateURL, String pingURL, String pingSeconds, String receivedUrl, Boolean isCheckTimeEnabled) {
 		if(this.id == null || this.id != id) {
 			this.id = id;
 			this.token = token;
@@ -248,6 +249,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			this.pingURL = pingURL;
 			this.lastChannel = "construct";
 			this.receivedUrl = receivedUrl;
+			this.isCheckTimeEnabled = isCheckTimeEnabled;
 
 			try {
 				this.pingSeconds = Integer.parseInt(pingSeconds);
@@ -340,14 +342,20 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	 * @param message the message received
 	 */
 	public void handleMessage(String channel, String message) {
-		if (this.checkPingTime(this.getRideParameter(message, ACCEPT_DATETIME_LIMIT))) {
-			Log.d("###", "Com tempo");
+		if (this.isCheckTimeEnabled == true) {
+			if (this.checkPingTime(this.getRideParameter(message, ACCEPT_DATETIME_LIMIT))) {
+				Log.d("###", "Com tempo");
 
+				lastChannel = channel;
+				BubbleService.startRequestBubble(getReactApplicationContext(), 2);
+				emitRequest(channel ,message, status.equals(ONLINE));
+			} else {
+				Log.d("###", "Sem tempo");
+			}
+		} else {
 			lastChannel = channel;
 			BubbleService.startRequestBubble(getReactApplicationContext(), 2);
 			emitRequest(channel ,message, status.equals(ONLINE));
-		} else {
-			Log.d("###", "Sem tempo");
 		}
 
 		this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
