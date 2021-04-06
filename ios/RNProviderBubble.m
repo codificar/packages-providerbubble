@@ -13,7 +13,7 @@
 
 @interface RCT_EXTERN_MODULE(RNProviderBubble, RCTEventEmitter)
 
-RCT_EXTERN_METHOD(setupProviderContext : (NSString *)id token:(NSString *)token status:(NSString *)status redisURI:(NSString *)redisURI changeStateURL:(NSString *)changeStateURL pingURL:(NSString *)pingURL  pingSeconds:(NSString *)pingSeconds receivedUrl:(NSString *)receivedUrl)
+RCT_EXTERN_METHOD(setupProviderContext : (NSString *)id token:(NSString *)token status:(NSString *)status redisURI:(NSString *)redisURI changeStateURL:(NSString *)changeStateURL pingURL:(NSString *)pingURL  pingSeconds:(NSString *)pingSeconds receivedUrl:(NSString *)receivedUrl isCheckTimeEnable:(BOOL *)isCheckTimeEnable)
 
 RCT_EXTERN_METHOD(
                   startService: (RCTPromiseResolveBlock)resolve

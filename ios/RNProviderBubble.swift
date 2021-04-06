@@ -19,6 +19,7 @@ class RNProviderBubble: RCTEventEmitter{
 	static var receivedUrl: String?
 	static let ONLINE: String = "1"
 	static let OFFLINE: String = "0"
+    static var isCheckTimeEnable: Bool?
 	
 	// Array of event names that we can listen to
 	override func supportedEvents() -> [String]! {
@@ -58,7 +59,7 @@ class RNProviderBubble: RCTEventEmitter{
   	}
   
 	@objc
-	func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String, receivedUrl: String ) {
+    func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String, receivedUrl: String, isCheckTimeEnable: Bool ) {
 		if(RNProviderBubble.id == nil || RNProviderBubble.id != id) {
 			RNProviderBubble.id = id;
 			RNProviderBubble.token = token;
@@ -68,6 +69,7 @@ class RNProviderBubble: RCTEventEmitter{
 			RNProviderBubble.pingURL = pingURL;
 			RNProviderBubble.pingSeconds = Int(pingSeconds);
 			RNProviderBubble.receivedUrl = receivedUrl;
+            RNProviderBubble.isCheckTimeEnable = isCheckTimeEnable;
 			
 			startPingProvider()
 
@@ -215,11 +217,16 @@ class RNProviderBubble: RCTEventEmitter{
 	* @param message the message received
 	*/
   	func handleMessage(channel: String, message: String) {
-        let acceptDatetime = self.getRideParameter(message: message, key: "accept_datetime_limit")
-        
-        if (acceptDatetime != "" && self.checkPingTime(datetime: acceptDatetime) == true) {
+        if (RNProviderBubble.isCheckTimeEnable == true) {
+            let acceptDatetime = self.getRideParameter(message: message, key: "accept_datetime_limit")
+            
+            if (acceptDatetime != "" && self.checkPingTime(datetime: acceptDatetime) == true) {
+                sendEvent(withName: "handleRequest", body: ["data": message])
+            }
+        } else {
             sendEvent(withName: "handleRequest", body: ["data": message])
         }
+        
 
 		let rideId = self.getRideParameter(message: message, key: "request_id")
 
