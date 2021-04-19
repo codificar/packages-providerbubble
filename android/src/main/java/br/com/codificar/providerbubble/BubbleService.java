@@ -83,43 +83,47 @@ public class BubbleService extends Service {
     }
 
     private void prepareStart(Intent intent, int flags, int startId) {
+        try {
+            if (intent != null) {
+                Bundle bd = intent.getExtras();
 
-        if (intent != null) {
-            Bundle bd = intent.getExtras();
+                if (bd != null) {
+                    sMsg = bd.getString("EXTRA_MSG");
+                    if (bd.containsKey("startRequest")) {
+                        startRequest(bd.getLong("startRequest"));
+                    }
+                    if (bd.containsKey("stopRequest")) {
+                        long delay = bd.getLong("stopRequest");
+                        Log.i(TAG, "stopRequest - Delay: "+delay);
+                        stopRequest(delay);
+                    }
+                    if(bd.containsKey("stopTimeControl")){
+                        stopTimeControl();
+                    }
+                }
+                if (sMsg != null && sMsg.length() > 0) {
+                    if (startId == Service.START_STICKY) {
+                        new Handler().postDelayed(new Runnable() {
 
-            if (bd != null) {
-                sMsg = bd.getString("EXTRA_MSG");
-                if (bd.containsKey("startRequest")) {
-                    startRequest(bd.getLong("startRequest"));
-                }
-                if (bd.containsKey("stopRequest")) {
-                    long delay = bd.getLong("stopRequest");
-                    Log.i(TAG, "stopRequest - Delay: "+delay);
-                    stopRequest(delay);
-                }
-                if(bd.containsKey("stopTimeControl")){
-                    stopTimeControl();
+                            @Override
+                            public void run() {
+                                showMsg(sMsg);
+                            }
+                        }, 300);
+
+                    } else {
+                        showMsg(sMsg);
+                    }
+
                 }
             }
-            if (sMsg != null && sMsg.length() > 0) {
-                if (startId == Service.START_STICKY) {
-                    new Handler().postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            showMsg(sMsg);
-                        }
-                    }, 300);
-
-                } else {
-                    showMsg(sMsg);
-                }
-
+            if (startId == START_STICKY) {
+                handleStart();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (startId == START_STICKY) {
-            handleStart();
-        }
+
     }
 
     private Notification prepareStartForeground(Intent intent, int flags, int startId) {
@@ -186,35 +190,39 @@ public class BubbleService extends Service {
     }
 
     public void openOverAppsAlert() {
-        android.app.AlertDialog.Builder showBubbleDialog;
-        Context context = getApplicationContext();
+        try {
+            android.app.AlertDialog.Builder showBubbleDialog;
+            Context context = getApplicationContext();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            showBubbleDialog = new android.app.AlertDialog.Builder(getApplicationContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
-        } else {
-            showBubbleDialog = new android.app.AlertDialog.Builder(getApplicationContext());
-        }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                showBubbleDialog = new android.app.AlertDialog.Builder(getApplicationContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
+            } else {
+                showBubbleDialog = new android.app.AlertDialog.Builder(getApplicationContext());
+            }
 
-        showBubbleDialog.setTitle(context.getResources().getString(context.getResources().getIdentifier("over_other_apps_title", "string", context.getPackageName())));
-        showBubbleDialog.setMessage( context.getResources().getString(context.getResources().getIdentifier("over_other_apps_message", "string", context.getPackageName())));
+            showBubbleDialog.setTitle(context.getResources().getString(context.getResources().getIdentifier("over_other_apps_title", "string", context.getPackageName())));
+            showBubbleDialog.setMessage( context.getResources().getString(context.getResources().getIdentifier("over_other_apps_message", "string", context.getPackageName())));
 
-        showBubbleDialog.setPositiveButton("yes",
-            new DialogInterface.OnClickListener() {
+            showBubbleDialog.setPositiveButton("yes",
+                new DialogInterface.OnClickListener() {
 
-                public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse( "package: " + context.getPackageName() )); // TODO esse treco aqui
-                    getApplicationContext().startActivity(intent);
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse( "package: " + context.getPackageName() )); // TODO esse treco aqui
+                        getApplicationContext().startActivity(intent);
+                    }
+                });
+
+            showBubbleDialog.setNegativeButton("no",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
                 }
-            });
+                });
 
-        showBubbleDialog.setNegativeButton("no",
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-              }
-            });
-
-        showBubbleDialog.show();
+            showBubbleDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void handleStart() {
@@ -442,9 +450,13 @@ public class BubbleService extends Service {
             }
 
             public void onFinish() {
-                mParams.x = 0;
-                if(windowManager != null)
-                    windowManager.updateViewLayout(chatHead, mParams);
+                try {
+                    mParams.x = 0;
+                    if(windowManager != null)
+                        windowManager.updateViewLayout(chatHead, mParams);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }.start();
     }
@@ -454,15 +466,23 @@ public class BubbleService extends Service {
             WindowManager.LayoutParams mParams = (WindowManager.LayoutParams) chatHead.getLayoutParams();
 
             public void onTick(long t) {
-                long step = (500 - t) / 5;
-                if(windowManager != null)
-                    windowManager.updateViewLayout(chatHead, mParams);
+                try {
+                    long step = (500 - t) / 5;
+                    if(windowManager != null)
+                        windowManager.updateViewLayout(chatHead, mParams);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             public void onFinish() {
-                mParams.x = szWindow.x - chatHead.getWidth();
-                if(windowManager != null)
-                    windowManager.updateViewLayout(chatHead, mParams);
+                try {
+                    mParams.x = szWindow.x - chatHead.getWidth();
+                    if(windowManager != null)
+                        windowManager.updateViewLayout(chatHead, mParams);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }.start();
     }
@@ -640,24 +660,32 @@ public class BubbleService extends Service {
     }
 
     public static void stopRequestBubble(Context c, long delay) {
-        if(c != null) {
-            onRide = false;
-            Log.i(TAG, "Stop Request Bubble");
-            Intent intent = new Intent(c, BubbleService.class);
-            intent.putExtra("stopRequest", delay);
-            c.startService(intent);
-            Log.i(TAG, "Stopped Request Bubble");
+        try {
+            if(c != null) {
+                onRide = false;
+                Log.i(TAG, "Stop Request Bubble");
+                Intent intent = new Intent(c, BubbleService.class);
+                intent.putExtra("stopRequest", delay);
+                c.startService(intent);
+                Log.i(TAG, "Stopped Request Bubble");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     public static void startRequestBubble(Context c, long duration) {
-        if(c != null) {
-            onRide = true;
-            Log.i(TAG, "Start Request Bubble");
-            Intent intent = new Intent(c, BubbleService.class);
-            intent.putExtra("startRequest", duration);
-            c.startService(intent);
-            Log.i(TAG, "Started Request Bubble");
+        try {
+            if(c != null) {
+                onRide = true;
+                Log.i(TAG, "Start Request Bubble");
+                Intent intent = new Intent(c, BubbleService.class);
+                intent.putExtra("startRequest", duration);
+                c.startService(intent);
+                Log.i(TAG, "Started Request Bubble");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -342,23 +342,27 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	 * @param message the message received
 	 */
 	public void handleMessage(String channel, String message) {
-		if (this.isCheckTimeEnabled == true) {
-			if (this.checkPingTime(this.getRideParameter(message, ACCEPT_DATETIME_LIMIT))) {
-				Log.d("###", "Com tempo");
+		try {
+			if (this.isCheckTimeEnabled == true) {
+				if (this.checkPingTime(this.getRideParameter(message, ACCEPT_DATETIME_LIMIT))) {
+					Log.d("###", "Com tempo");
 
+					lastChannel = channel;
+					BubbleService.startRequestBubble(getReactApplicationContext(), 2);
+					emitRequest(channel ,message, status.equals(ONLINE));
+				} else {
+					Log.d("###", "Sem tempo");
+				}
+			} else {
 				lastChannel = channel;
 				BubbleService.startRequestBubble(getReactApplicationContext(), 2);
 				emitRequest(channel ,message, status.equals(ONLINE));
-			} else {
-				Log.d("###", "Sem tempo");
 			}
-		} else {
-			lastChannel = channel;
-			BubbleService.startRequestBubble(getReactApplicationContext(), 2);
-			emitRequest(channel ,message, status.equals(ONLINE));
-		}
 
-		this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
+			this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
