@@ -83,6 +83,8 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	private static final int PING = 10;
 	private static final int TOGGLE = 10;
 	private static final int RECEIVED = 11;
+	private static final String SUCCESS = "success";
+	private static final String ERROR_CODE = "error_code";
 
 	private static boolean hostActive;
 	private static String requestData;
@@ -171,6 +173,17 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 							handleMessage("ping", jsonLikeRedis.toString());
 						}
 					}
+
+					if (jsonObject.getBoolean(SUCCESS) == false && jsonObject.has(ERROR_CODE) && jsonObject.getInt(ERROR_CODE) == 406) {
+						this.toggleService(false);
+						RedisHandler.getInstance(this.redisURI, this)
+								.unsubscribePubSub("provider."+id);
+								
+						if (timerPing != null) {
+							timerPing.cancel();
+						}
+					}
+
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
