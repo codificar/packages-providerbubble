@@ -196,10 +196,18 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 				try {
 					jsonObjectReceived = new JSONObject(response);
 
+					if (jsonObjectReceived.has("success")) {
+						if (jsonObjectReceived.getBoolean("success") == false)
+							return;
+					}
+
 					if (jsonObjectReceived.has("time_error")) {
 						if (jsonObjectReceived.getBoolean("time_error") == true)
 							emitWrongDateTime();
 					}
+
+					BubbleService.startRequestBubble(getReactApplicationContext(), 2);
+					emitRequest(lastChannel, response, status.equals(ONLINE));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -356,23 +364,18 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	 */
 	public void handleMessage(String channel, String message) {
 		try {
+			this.lastChannel = channel;
+
 			if (this.isCheckTimeEnabled == true) {
 				if (this.checkPingTime(this.getRideParameter(message, ACCEPT_DATETIME_LIMIT))) {
 					Log.d("###", "Com tempo");
-
-					lastChannel = channel;
-					BubbleService.startRequestBubble(getReactApplicationContext(), 2);
-					emitRequest(channel ,message, status.equals(ONLINE));
+					this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
 				} else {
 					Log.d("###", "Sem tempo");
 				}
 			} else {
-				lastChannel = channel;
-				BubbleService.startRequestBubble(getReactApplicationContext(), 2);
-				emitRequest(channel ,message, status.equals(ONLINE));
+				this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
 			}
-
-			this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
