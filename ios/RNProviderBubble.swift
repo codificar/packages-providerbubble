@@ -217,22 +217,21 @@ class RNProviderBubble: RCTEventEmitter{
 	* @param message the message received
 	*/
   	func handleMessage(channel: String, message: String) {
+		let rideId = self.getRideParameter(message: message, key: "request_id")
+
         if (RNProviderBubble.isCheckTimeEnable == true) {
             let acceptDatetime = self.getRideParameter(message: message, key: "accept_datetime_limit")
             
             if (acceptDatetime != "" && self.checkPingTime(datetime: acceptDatetime) == true) {
-                sendEvent(withName: "handleRequest", body: ["data": message])
+                if (rideId != "") {
+					self.postRequestReceived(channel: channel, request_id: rideId)
+				}
             }
         } else {
-            sendEvent(withName: "handleRequest", body: ["data": message])
+            if (rideId != "") {
+				self.postRequestReceived(channel: channel, request_id: rideId)
+			}
         }
-        
-
-		let rideId = self.getRideParameter(message: message, key: "request_id")
-
-		if (rideId != "") {
-			self.postRequestReceived(channel: channel, request_id: rideId)
-		}
   	}
   
 	/**
@@ -320,6 +319,7 @@ class RNProviderBubble: RCTEventEmitter{
 				debugPrint("DEBUG: postRequestReceived error")
 			} else {
 				debugPrint("DEBUG: postRequestReceived success")
+				sendEvent(withName: "handleRequest", body: ["data": data])
 				if let json = try? JSONSerialization.jsonObject(with: data!, options: [.allowFragments]) as! AnyObject {
 					debugPrint(json)
 					do{
