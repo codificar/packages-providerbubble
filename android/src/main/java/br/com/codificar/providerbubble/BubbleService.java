@@ -168,7 +168,7 @@ public class BubbleService extends Service {
         super.onCreate();
 
         activateWakeLock();
-		    if (android.os.Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(getApplicationContext())) {
+        if (android.os.Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(getApplicationContext())) {
             RNProviderBubbleModule.emitShowOverAppsAlert();
             return;
         }
