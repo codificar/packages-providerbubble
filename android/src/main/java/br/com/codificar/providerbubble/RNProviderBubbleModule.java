@@ -68,7 +68,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	private static final int PERMISSION_OVERLAY_SCREEN = 78;
 
 	private String id, token, status, changeStateURL, pingURL, redisURI, lastChannel, receivedUrl;
-	private boolean isCheckTimeEnabled;
+	private boolean isCheckTimeEnabled, isSynchronousAckEnabled;
 	private int pingSeconds = 15;
 	private RequestQueue requestQueue;
 
@@ -200,6 +200,13 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 						if (jsonObjectReceived.getBoolean("time_error") == true)
 							emitWrongDateTime();
 					}
+
+					if (jsonObjectReceived.has("success")) {
+						if (jsonObjectReceived.getBoolean("success") == true) {
+							String message = "{\"data\": " + response + "}";
+							emitRequest(lastChannel , message, status.equals(ONLINE));
+						}
+					}
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -252,7 +259,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	}
 
 	@ReactMethod
-	public void setupProviderContext(String id, String token, String status, String redisURI, String changeStateURL, String pingURL, String pingSeconds, String receivedUrl, Boolean isCheckTimeEnabled) {
+	public void setupProviderContext(String id, String token, String status, String redisURI, String changeStateURL, String pingURL, String pingSeconds, String receivedUrl, Boolean isCheckTimeEnabled, Boolean isSynchronousAckEnabled) {
 		if(this.id == null || this.id != id) {
 			this.id = id;
 			this.token = token;
@@ -263,6 +270,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			this.lastChannel = "construct";
 			this.receivedUrl = receivedUrl;
 			this.isCheckTimeEnabled = isCheckTimeEnabled;
+			this.isSynchronousAckEnabled = isSynchronousAckEnabled;
 
 			try {
 				this.pingSeconds = Integer.parseInt(pingSeconds);
@@ -360,6 +368,11 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 				if (this.checkPingTime(this.getRideParameter(message, ACCEPT_DATETIME_LIMIT))) {
 					Log.d("###", "Com tempo");
 
+					if (this.isSynchronousAckEnabled == true) {
+						this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
+						return;
+					}
+
 					lastChannel = channel;
 					BubbleService.startRequestBubble(getReactApplicationContext(), 2);
 					emitRequest(channel ,message, status.equals(ONLINE));
@@ -367,6 +380,12 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 					Log.d("###", "Sem tempo");
 				}
 			} else {
+
+				if (this.isSynchronousAckEnabled == true) {
+					this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
+					return;
+				}
+
 				lastChannel = channel;
 				BubbleService.startRequestBubble(getReactApplicationContext(), 2);
 				emitRequest(channel ,message, status.equals(ONLINE));
