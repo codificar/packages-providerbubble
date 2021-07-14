@@ -228,7 +228,7 @@ class RNProviderBubble: RCTEventEmitter{
 
 				if (RNProviderBubble.isSynchronousAckEnabled == true && rideId != "") {
 					self.postRequestReceived(channel: channel, request_id: rideId)
-					return ""
+					return
 				}
 
                 sendEvent(withName: "handleRequest", body: ["data": message])
@@ -236,7 +236,7 @@ class RNProviderBubble: RCTEventEmitter{
         } else {
 			if (RNProviderBubble.isSynchronousAckEnabled == true && rideId != "") {
 				self.postRequestReceived(channel: channel, request_id: rideId)
-				return ""
+				return
 			}
 
             sendEvent(withName: "handleRequest", body: ["data": message])
@@ -342,9 +342,9 @@ class RNProviderBubble: RCTEventEmitter{
 						}
 
 						if let success = json["success"] as? Bool{
-							if (success == true) {
+                            if (success == true && RNProviderBubble.isSynchronousAckEnabled == true) {
 								let message = "{ \"data\" : " + RNProviderBubble.stringify(json: json) + "}"
-								sendEvent(withName: "handleRequest", body: ["data": message])
+                                self.sendEvent(withName: "handleRequest", body: ["data": message])
 							}
 						}
 						
