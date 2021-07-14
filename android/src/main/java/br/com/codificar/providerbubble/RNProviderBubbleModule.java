@@ -201,9 +201,10 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 							emitWrongDateTime();
 					}
 
-					if (jsonObjectReceived.has("success")) {
+					if (jsonObjectReceived.has("success") && this.isSynchronousAckEnabled == true) {
 						if (jsonObjectReceived.getBoolean("success") == true) {
 							String message = "{\"data\": " + response + "}";
+							BubbleService.startRequestBubble(getReactApplicationContext(), 2);
 							emitRequest(lastChannel , message, status.equals(ONLINE));
 						}
 					}
