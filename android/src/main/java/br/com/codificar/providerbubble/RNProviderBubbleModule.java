@@ -529,9 +529,13 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	}
 
 	private static void emitDeviceEvent(String eventName, @Nullable WritableMap eventData) {
-		// A method for emitting from the native side to JS
-		// https://facebook.github.io/react-native/docs/native-modules-android.html#sending-events-to-javascript
-		reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, eventData);
+		try {
+			// A method for emitting from the native side to JS
+			// https://facebook.github.io/react-native/docs/native-modules-android.html#sending-events-to-javascript
+			reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, eventData);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void emitShowOverAppsAlert(){

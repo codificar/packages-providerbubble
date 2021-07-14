@@ -202,12 +202,7 @@ class RNProviderBubble: RCTEventEmitter{
     	rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
     	do {
-			if(RNProviderBubble.id != nil){
-				let channel = "provider." + RNProviderBubble.id!;
-				try RedisHandler.getInstance(redisURI: RNProviderBubble.redisURI!, module: self).unsubscribePubSub(channel: channel)
-				RNProviderBubble.status = RNProviderBubble.OFFLINE
-				resolve("Successfully unsubscribed")
-			}
+			resolve("Successfully unsubscribed")
 		} catch {
 			reject("ER_UNSUB", "Failed to unsubscribe", error)
 		}
