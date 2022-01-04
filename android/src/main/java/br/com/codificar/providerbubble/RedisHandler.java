@@ -2,13 +2,12 @@ package br.com.codificar.providerbubble;
 
 import android.util.Log;
 
-import java.util.logging.Handler;
-
 import io.lettuce.core.RedisClient;
-import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.pubsub.RedisPubSubAdapter;
 
 import br.com.codificar.providerbubble.RNProviderBubbleModule;
+import io.lettuce.core.pubsub.api.sync.RedisPubSubCommands;
 
 /**
  * A handler to a Redis PubSub client. Can handle multiple subscribed channels at a time.
@@ -16,13 +15,14 @@ import br.com.codificar.providerbubble.RNProviderBubbleModule;
 public class RedisHandler {
 
     private String redisURI;    // Redis connection  URI: redis://[password@]host[:port][/databaseNumber]
-    private RedisPubSubAsyncCommands<String, String> redisInConnection;  // the Redis connection for subscribe
-    private RedisPubSubAsyncCommands<String, String> redisOutConnection;  // the Redis connection for publish
-    private RedisPubSubAdapter<String, String> listener;    // the Redis channels listener
+
+    RedisPubSubCommands<String, String> redisInConnection;
+    RedisPubSubCommands<String, String> redisOutConnection;
 
     private RNProviderBubbleModule bridgeModule;
 
     private static RedisHandler singletonHandler;   // singleton instance
+    public boolean alreadySubscription = false;
 
     /**
      * Get the singleton Redis handler instance
@@ -35,7 +35,7 @@ public class RedisHandler {
     public static RedisHandler getInstance(String redisURI, RNProviderBubbleModule module) {
         try {
             if(singletonHandler == null) {
-              singletonHandler = new RedisHandler(redisURI, module);
+                singletonHandler = new RedisHandler(redisURI, module);
             }
             return singletonHandler;
         } catch (Exception ex) {
@@ -52,24 +52,24 @@ public class RedisHandler {
      */
     private RedisHandler(String redisURI, RNProviderBubbleModule module) {
         try {
-            this.redisURI = redisURI;
-            this.bridgeModule = module;
+            if (redisURI != null && redisURI != "") {
+                this.redisURI = redisURI;
+                this.bridgeModule = module;
 
-            // Create connection
-            RedisClient client = RedisClient.create(this.redisURI);
+                // Create connection
+                RedisClient client = RedisClient.create(this.redisURI);
+                StatefulRedisPubSubConnection<String, String> connection = client.connectPubSub();
 
-            redisInConnection = client.connectPubSub().async();
-            redisOutConnection = client.connectPubSub().async();
+                connection.addListener(new RedisPubSubAdapter<String, String>() {
+                    @Override
+                    public void message(String channel, String message) {
+                        singletonHandler.bridgeModule.handleMessage("redis", message);
+                    }
+                });
 
-            // Create and add the listener
-            listener = new RedisPubSubAdapter<String, String>() {
-                @Override
-                public void message(String channel, String message) {
-                  singletonHandler.bridgeModule.handleMessage("redis", message);
-                }
-            };
-
-            redisInConnection.getStatefulConnection().addListener(listener);
+                redisInConnection = connection.sync();
+                redisOutConnection = connection.sync();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -82,7 +82,10 @@ public class RedisHandler {
      */
     public void subscribePubSub(String channel) {
         try {
-            redisInConnection.subscribe(channel);
+            if(redisInConnection != null && alreadySubscription == false) {
+                redisInConnection.subscribe(channel);
+                alreadySubscription = true;
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -96,7 +99,7 @@ public class RedisHandler {
     public void unsubscribePubSub(String channel){
         try {
             if(redisInConnection != null) {
-              redisInConnection.unsubscribe(channel);
+                redisInConnection.unsubscribe(channel);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
