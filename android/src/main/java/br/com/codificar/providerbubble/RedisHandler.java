@@ -100,6 +100,7 @@ public class RedisHandler {
         try {
             if(redisInConnection != null) {
                 redisInConnection.unsubscribe(channel);
+                alreadySubscription = false;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
