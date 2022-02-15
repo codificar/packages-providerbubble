@@ -45,6 +45,8 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'com.android.volley:volley:1.1.1'
-
+    implementation 'io.netty:netty-all:4.1.68.Final'
+    implementation 'org.reactivestreams:reactive-streams:1.0.3'
+    implementation 'io.projectreactor:reactor-core:3.3.22.RELEASE'
 }
   
