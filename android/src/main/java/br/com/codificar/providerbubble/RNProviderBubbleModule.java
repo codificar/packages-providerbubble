@@ -67,7 +67,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	private static ReactApplicationContext reactContext = null;
 	private static final int PERMISSION_OVERLAY_SCREEN = 78;
 
-	private String id, token, status, changeStateURL, pingURL, redisURI, lastChannel, receivedUrl;
+	private String id, token, status, changeStateURL, pingURL, redisURI, lastChannel, receivedUrl, redisDatabase;
 	private boolean isCheckTimeEnabled, isSynchronousAckEnabled;
 	private int pingSeconds = 15;
 	private RequestQueue requestQueue;
@@ -134,7 +134,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			{
 				this.toggleService(false);
 				RedisHandler.getInstance(this.redisURI, this)
-					.unsubscribePubSub("provider."+id);
+					.unsubscribePubSub("provider."+ this.redisDatabase + "." + id);
 
 				HashMap<String, String> map = new HashMap<>();
 				map.put("url", changeStateURL);
@@ -177,7 +177,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 					if (jsonObject.getBoolean(SUCCESS) == false && jsonObject.has(ERROR_CODE) && jsonObject.getInt(ERROR_CODE) == 406) {
 						this.toggleService(false);
 						RedisHandler.getInstance(this.redisURI, this)
-								.unsubscribePubSub("provider."+id);
+								.unsubscribePubSub("provider." + this.redisDatabase + "." + id);
 								
 						if (timerPing != null) {
 							timerPing.cancel();
@@ -266,6 +266,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			this.token = token;
 			this.status = status;
 			this.redisURI = redisURI;
+			this.redisDatabase = redisURI.split("/")[3];
 			this.changeStateURL = changeStateURL;
 			this.pingURL = pingURL;
 			this.lastChannel = "construct";
@@ -289,7 +290,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	public void setupProviderContextClear() {
 		try{
 			RedisHandler.getInstance(this.redisURI, this)
-			.unsubscribePubSub("provider."+this.id);
+			.unsubscribePubSub("provider." + this.redisDatabase + "." + this.id);
 			this.id = "";
 			this.token = "";
 			this.status = OFFLINE;
@@ -326,9 +327,8 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	}
 
 	public void subRedis(){
-		Log.d("subRedis:", this.redisURI);
 		RedisHandler.getInstance(this.redisURI, this)
-				.subscribePubSub("provider."+id);
+			.subscribePubSub("provider." + this.redisDatabase + "." + id);
 	}
 
 	public void postPing() throws Exception {
@@ -438,7 +438,7 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 			this.status = OFFLINE;
 
 			RedisHandler.getInstance(this.redisURI, this)
-				.unsubscribePubSub("provider."+id);
+				.unsubscribePubSub("provider." + this.redisDatabase + "." + id);
 
 		} catch (Exception e) {
 			promise.reject(e);
