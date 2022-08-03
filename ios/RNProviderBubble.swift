@@ -13,6 +13,7 @@ class RNProviderBubble: RCTEventEmitter{
 	static var token: String?
 	static var status: String?
 	static var redisURI: String?
+	static var redisDatabase: String?
 	static var changeStateURL: String?
 	static var pingURL: String?
 	static var pingSeconds: Int! = 0
@@ -66,6 +67,7 @@ class RNProviderBubble: RCTEventEmitter{
 			RNProviderBubble.token = token;
 			RNProviderBubble.status = status;
 			RNProviderBubble.redisURI = redisURI;
+			RNProviderBubble.redisDatabase = redisURI.components(separatedBy: "/")[3];
 			RNProviderBubble.changeStateURL = changeStateURL;
 			RNProviderBubble.pingURL = pingURL;
 			RNProviderBubble.pingSeconds = Int(pingSeconds);
@@ -170,7 +172,7 @@ class RNProviderBubble: RCTEventEmitter{
     	rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
 		do {
-			let channel = "provider." + RNProviderBubble.id!;
+			let channel = "provider." + RNProviderBubble.redisDatabase! + "." + RNProviderBubble.id!;
 			try RedisHandler.getInstance(redisURI: RNProviderBubble.redisURI!, module: self).subscribePubSub(channel: channel)
 			RNProviderBubble.status = RNProviderBubble.ONLINE
 			resolve("Successfully connected and subscribed")
@@ -186,7 +188,7 @@ class RNProviderBubble: RCTEventEmitter{
     ) -> Void {
 		do {
 			if(RNProviderBubble.id != nil){
-				let channel = "provider." + RNProviderBubble.id!;
+				let channel = "provider." + RNProviderBubble.redisDatabase! + "." + RNProviderBubble.id!;
 				try RedisHandler.getInstance(redisURI: RNProviderBubble.redisURI!, module: self).unsubscribePubSub(channel: channel)
 				RNProviderBubble.status = RNProviderBubble.OFFLINE
 				resolve("Successfully unsubscribed")
