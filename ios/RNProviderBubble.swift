@@ -61,13 +61,13 @@ class RNProviderBubble: RCTEventEmitter{
   	}
   
 	@objc
-    func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String, receivedUrl: String, isCheckTimeEnable: Bool, isSynchronousAckEnabled: Bool ) {
+    func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String, receivedUrl: String, isCheckTimeEnable: Bool, isSynchronousAckEnabled: Bool, redisDatabase: String ) {
 		if(RNProviderBubble.id == nil || RNProviderBubble.id != id) {
 			RNProviderBubble.id = id;
 			RNProviderBubble.token = token;
 			RNProviderBubble.status = status;
 			RNProviderBubble.redisURI = redisURI;
-			RNProviderBubble.redisDatabase = redisURI.components(separatedBy: "/")[3];
+			RNProviderBubble.redisDatabase = redisDatabase;
 			RNProviderBubble.changeStateURL = changeStateURL;
 			RNProviderBubble.pingURL = pingURL;
 			RNProviderBubble.pingSeconds = Int(pingSeconds);
