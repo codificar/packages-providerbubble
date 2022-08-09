@@ -147,7 +147,7 @@ public class BubbleService extends Service {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "provider_channel");
-        
+
         builder
             .setSmallIcon(context.getResources().getIdentifier("ic_launcher", "mipmap", context.getPackageName())) //TODO MIPMAP
             .setLargeIcon(BitmapFactory.decodeResource(getResources(), context.getResources().getIdentifier("ic_launcher", "mipmap", context.getPackageName()))) //TODO MIPMAP
@@ -158,7 +158,7 @@ public class BubbleService extends Service {
             .setWhen(System.currentTimeMillis());
 
         Intent startIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getApplicationContext().getPackageName()));
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 1000, startIntent, 0);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 1000, startIntent, PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(contentIntent);
         return builder.build();
     }
@@ -587,7 +587,7 @@ public class BubbleService extends Service {
             }
         }
 
-        // int imageVector = R.drawable.app_bubble_services;    
+        // int imageVector = R.drawable.app_bubble_services;
         if(onRide){
             imageVector = context.getResources().getIdentifier("app_bubble_service", "drawable", context.getPackageName());
             if(imageVector == 0){
@@ -598,7 +598,7 @@ public class BubbleService extends Service {
                 }
             }
         }
-    
+
         if(chatHead!=null && imageVector!=0) {
             chatHead.setImageResource(imageVector);
         }
