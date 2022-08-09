@@ -158,7 +158,7 @@ public class BubbleService extends Service {
             .setWhen(System.currentTimeMillis());
 
         Intent startIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getApplicationContext().getPackageName()));
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 1000, startIntent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 1000, startIntent, 33554432);
         builder.setContentIntent(contentIntent);
         return builder.build();
     }
@@ -506,7 +506,7 @@ public class BubbleService extends Service {
                 //+ ".MainActivity"
                 Intent mainIntent = new Intent(this, BubbleService.currentActivity.getClass() );
                 PendingIntent mainPIntent = PendingIntent.getActivity(getApplicationContext(), 0,
-                        mainIntent, 0);
+                        mainIntent, 33554432);
                 mainIntent.setAction("android.intent.action.MAIN");
                 mainIntent.addCategory("android.intent.category.LAUNCHER");
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
