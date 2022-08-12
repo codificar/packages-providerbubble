@@ -61,13 +61,13 @@ class RNProviderBubble: RCTEventEmitter{
   	}
   
 	@objc
-    func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String, receivedUrl: String, isCheckTimeEnable: Bool, isSynchronousAckEnabled: Bool, redisDatabase: String ) {
+    func setupProviderContext(_ id: String, token: String, status: String, redisURI: String, changeStateURL: String, pingURL: String , pingSeconds: String, receivedUrl: String, isCheckTimeEnable: Bool, isSynchronousAckEnabled: Bool ) {
 		if(RNProviderBubble.id == nil || RNProviderBubble.id != id) {
 			RNProviderBubble.id = id;
 			RNProviderBubble.token = token;
 			RNProviderBubble.status = status;
 			RNProviderBubble.redisURI = redisURI;
-			RNProviderBubble.redisDatabase = redisDatabase;
+			RNProviderBubble.redisDatabase = getRedisDatabase(redisURI);
 			RNProviderBubble.changeStateURL = changeStateURL;
 			RNProviderBubble.pingURL = pingURL;
 			RNProviderBubble.pingSeconds = Int(pingSeconds);
@@ -78,6 +78,16 @@ class RNProviderBubble: RCTEventEmitter{
 			startPingProvider()
 
 		}
+	}
+
+	func getRedisDatabase(_ redisURI: String) -> String {
+		if (redisURI.isEmpty) {
+			return "0"
+		}
+
+		let redisDatabase = redisURI.components(separatedBy: "/");
+
+		return redisDatabase[redisDatabase.count - 1];
 	}
 
   	func startPingProvider() -> Void {

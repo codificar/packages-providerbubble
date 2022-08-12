@@ -4,8 +4,8 @@ import { NativeModules } from 'react-native';
 const { RNProviderBubble } = NativeModules;
 
 export default {
-	setupProviderContext(id, token, status, redisURI, changeStateURL, pingUrl, pingSeconds, receivedUrl, isCheckTimeEnabled = false, isSynchronousAckEnabled = false, redisDatabase = "0") {
-		return RNProviderBubble.setupProviderContext(id, token, status, redisURI, changeStateURL, pingUrl, pingSeconds, receivedUrl, isCheckTimeEnabled, isSynchronousAckEnabled, redisDatabase)
+	setupProviderContext(id, token, status, redisURI, changeStateURL, pingUrl, pingSeconds, receivedUrl, isCheckTimeEnabled = false, isSynchronousAckEnabled = false) {
+		return RNProviderBubble.setupProviderContext(id, token, status, redisURI, changeStateURL, pingUrl, pingSeconds, receivedUrl, isCheckTimeEnabled, isSynchronousAckEnabled)
 	},
 	startService() {
 		return RNProviderBubble.startService()

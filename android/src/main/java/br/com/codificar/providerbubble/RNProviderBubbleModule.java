@@ -260,13 +260,13 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	}
 
 	@ReactMethod
-	public void setupProviderContext(String id, String token, String status, String redisURI, String changeStateURL, String pingURL, String pingSeconds, String receivedUrl, Boolean isCheckTimeEnabled, Boolean isSynchronousAckEnabled, String redisDatabase) {
+	public void setupProviderContext(String id, String token, String status, String redisURI, String changeStateURL, String pingURL, String pingSeconds, String receivedUrl, Boolean isCheckTimeEnabled, Boolean isSynchronousAckEnabled) {
 		if(this.id == null || this.id != id) {
 			this.id = id;
 			this.token = token;
 			this.status = status;
 			this.redisURI = redisURI;
-			this.redisDatabase = redisDatabase;
+			this.redisDatabase = getRedisDatabase(redisURI);
 			this.changeStateURL = changeStateURL;
 			this.pingURL = pingURL;
 			this.lastChannel = "construct";
@@ -284,6 +284,18 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 
 			startPingProvider();
 		}
+	}
+
+	private String getRedisDatabase(String redisURI) {
+		String[] redisDatabase;
+
+		if (redisURI == null || redisURI.length() == 0) {
+			return "0";
+		}
+
+		redisDatabase = redisURI.split("/");
+		
+		return redisDatabase[redisDatabase.length - 1];
 	}
 
 	@ReactMethod
