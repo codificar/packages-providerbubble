@@ -4,11 +4,14 @@ import android.util.Log;
 
 import java.util.logging.Handler;
 
-import com.lambdaworks.redis.RedisClient;
-import com.lambdaworks.redis.pubsub.RedisPubSubAdapter;
-import com.lambdaworks.redis.pubsub.RedisPubSubConnection;
-
 import br.com.codificar.providerbubble.RNProviderBubbleModule;
+
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
+import io.lettuce.core.pubsub.RedisPubSubAdapter;
+import io.lettuce.core.pubsub.api.sync.RedisPubSubCommands;
+
+
 
 /**
  * A handler to a Redis PubSub client. Can handle multiple subscribed channels at a time.
@@ -16,13 +19,14 @@ import br.com.codificar.providerbubble.RNProviderBubbleModule;
 public class RedisHandler {
 
     private String redisURI;    // Redis connection  URI: redis://[password@]host[:port][/databaseNumber]
-    private RedisPubSubConnection<String, String> redisInConnection;  // the Redis connection for subscribe
-    private RedisPubSubConnection<String, String> redisOutConnection;  // the Redis connection for publish
-    private RedisPubSubAdapter<String, String> listener;    // the Redis channels listener
 
     private RNProviderBubbleModule bridgeModule;
 
     private static RedisHandler singletonHandler;   // singleton instance
+
+    private RedisPubSubCommands<String, String> redisInConnection;  // the Redis connection for subscribe
+    private RedisPubSubCommands<String, String> redisOutConnection;  // the Redis connection for publish
+    private boolean alreadySubscription = false;
 
     /**
      * Get the singleton Redis handler instance
@@ -32,10 +36,11 @@ public class RedisHandler {
      * 
      * @return the handler singleton instance
      */
-    public static RedisHandler getInstance(String redisURI, RNProviderBubbleModule module) {
-        if(singletonHandler == null) {
+    public static synchronized RedisHandler getInstance(String redisURI, RNProviderBubbleModule module) {
+        if (singletonHandler == null) {
             singletonHandler = new RedisHandler(redisURI, module);
         }
+        
         return singletonHandler;
     }
 
@@ -46,22 +51,31 @@ public class RedisHandler {
      * @param module the RNProviderBubbleModule instance
      */
     private RedisHandler(String redisURI, RNProviderBubbleModule module) {
-        this.redisURI = redisURI;
-        this.bridgeModule = module;
-
-        // Create connection
-        RedisClient client = RedisClient.create(this.redisURI);
-        redisInConnection = client.connectPubSub();
-        redisOutConnection = client.connectPubSub();
-
-        // Create and add the listener
-        listener = new RedisPubSubAdapter<String, String>() {
-            @Override
-            public void message(String channel, String message) {
-                singletonHandler.bridgeModule.handleMessage("redis", message);
+        try {
+            if (redisURI == null || redisURI.length() == 0) {
+                return;
             }
-        };
-        redisInConnection.addListener(listener);
+    
+            this.redisURI = redisURI;
+            this.bridgeModule = module;
+    
+            // Create connection
+            RedisClient client = RedisClient.create(this.redisURI);
+    
+            StatefulRedisPubSubConnection<String, String> connection = client.connectPubSub();
+    
+            connection.addListener(new RedisPubSubAdapter<String, String>() {
+                @Override
+                public void message(String channel, String message) {
+                    singletonHandler.bridgeModule.handleMessage("redis", message);
+                }
+            });
+    
+            this.redisInConnection = connection.sync();
+            this.redisOutConnection = connection.sync();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -70,7 +84,14 @@ public class RedisHandler {
      * @param channel the redis channel name
      */
     public void subscribePubSub(String channel) {
-        redisInConnection.subscribe(channel);
+        try {
+            if (this.redisInConnection != null && this.alreadySubscription == false) {
+                this.redisInConnection.subscribe(channel);
+                this.alreadySubscription = true;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -79,8 +100,13 @@ public class RedisHandler {
      * @param channel the Redis channel name
      */
     public void unsubscribePubSub(String channel){
-        if(redisInConnection != null) {
-            redisInConnection.unsubscribe(channel);
+        try {
+            if (this.redisInConnection != null) {
+                this.redisInConnection.unsubscribe(channel);
+                this.alreadySubscription = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -91,8 +117,12 @@ public class RedisHandler {
      * @param message the message to publish
      */
     public void publishPubSub(String channel, String message) {
-        if(redisOutConnection != null) {
-            redisOutConnection.publish(channel, message);
+        try {
+            if (this.redisOutConnection != null) {
+              this.redisOutConnection.publish(channel, message);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
