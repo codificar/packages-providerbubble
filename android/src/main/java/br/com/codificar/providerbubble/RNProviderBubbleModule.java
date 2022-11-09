@@ -204,7 +204,6 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 					if (jsonObjectReceived.has("success") && this.isSynchronousAckEnabled == true) {
 						if (jsonObjectReceived.getBoolean("success") == true) {
 							String message = "{\"data\": " + response + "}";
-							BubbleService.startRequestBubble(getReactApplicationContext(), 2);
 							emitRequest(lastChannel , message, status.equals(ONLINE));
 						}
 					}
@@ -377,32 +376,13 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	 */
 	public void handleMessage(String channel, String message) {
 		try {
-			if (this.isCheckTimeEnabled == true) {
-				if (this.checkPingTime(this.getRideParameter(message, ACCEPT_DATETIME_LIMIT))) {
-					Log.d("###", "Com tempo");
-
-					if (this.isSynchronousAckEnabled == true) {
-						this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
-						return;
-					}
-
-					lastChannel = channel;
-					BubbleService.startRequestBubble(getReactApplicationContext(), 2);
-					emitRequest(channel ,message, status.equals(ONLINE));
-				} else {
-					Log.d("###", "Sem tempo");
-				}
-			} else {
-
-				if (this.isSynchronousAckEnabled == true) {
-					this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
-					return;
-				}
-
-				lastChannel = channel;
-				BubbleService.startRequestBubble(getReactApplicationContext(), 2);
-				emitRequest(channel ,message, status.equals(ONLINE));
+			if (this.isSynchronousAckEnabled == true) {
+				this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
+				return;
 			}
+
+			lastChannel = channel;
+			emitRequest(channel, message, status.equals(ONLINE));
 
 			this.postReceived(channel, this.getRideParameter(message, REQUEST_ID));
 		} catch (Exception e) {
@@ -704,4 +684,20 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 		map.putBoolean("time_error", true);
 		emitDeviceEvent("deviceWrongDate", map);
 	}
+
+	@ReactMethod
+	public void startRequest(Promise promise) {
+		String result = "Success";
+
+		try {
+			BubbleService.startRequestBubble(getReactApplicationContext(), 2);
+		} catch (Exception e) {
+			promise.reject(e);
+			result = "Failed";
+			return;
+		}
+
+		promise.resolve(result);
+	}
+
 }
