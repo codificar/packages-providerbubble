@@ -176,8 +176,14 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 
 					if (jsonObject.getBoolean(SUCCESS) == false && jsonObject.has(ERROR_CODE) && jsonObject.getInt(ERROR_CODE) == 406) {
 						this.toggleService(false);
-						RedisHandler.getInstance(this.redisURI, this)
+
+						try {
+							RedisHandler.getInstance(this.redisURI, this)
 								.unsubscribePubSub("provider." + this.redisDatabase + "." + id);
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+
 
 						if (timerPing != null) {
 							timerPing.cancel();
@@ -338,8 +344,12 @@ public class RNProviderBubbleModule extends ReactContextBaseJavaModule implement
 	}
 
 	public void subRedis(){
-		RedisHandler.getInstance(this.redisURI, this)
-			.subscribePubSub("provider." + this.redisDatabase + "." + id);
+		try {
+			RedisHandler.getInstance(this.redisURI, this)
+				.subscribePubSub("provider." + this.redisDatabase + "." + id);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public void postPing() throws Exception {
