@@ -48,6 +48,8 @@ import android.net.Uri;
 
 import android.media.MediaPlayer;
 
+import android.content.pm.ServiceInfo;
+
 public class BubbleService extends Service {
     public static final String APP_NAME = "Prestação de Serviços"; // TODO isso deve vir externo
     public static final String REACT_CLASS = "RNProviderBubble";
@@ -137,12 +139,11 @@ public class BubbleService extends Service {
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("provider_channel",
-                "Provider channel", NotificationManager.IMPORTANCE_DEFAULT);
+                    "Provider channel", NotificationManager.IMPORTANCE_DEFAULT);
             channel.setDescription("Provider channel");
-            if(notificationManager != null)
+            if (notificationManager != null)
                 notificationManager.createNotificationChannel(channel);
         }
 
@@ -158,7 +159,10 @@ public class BubbleService extends Service {
             .setWhen(System.currentTimeMillis());
 
         Intent startIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getApplicationContext().getPackageName()));
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 1000, startIntent, 33554432);
+
+        // Aqui a mudança para usar FLAG_IMMUTABLE
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 1000, startIntent, PendingIntent.FLAG_IMMUTABLE);
+        
         builder.setContentIntent(contentIntent);
         return builder.build();
     }
@@ -501,25 +505,30 @@ public class BubbleService extends Service {
     private void chathead_click() {
 
         try {
-            //String here = getApplicationContext().getPackageName();
+            // Verifica se a versão mínima é atendida
             if (minVersion()) {
-                //+ ".MainActivity"
-                Intent mainIntent = new Intent(this, BubbleService.currentActivity.getClass() );
+                // Cria um Intent para a atividade atual
+                Intent mainIntent = new Intent(this, BubbleService.currentActivity.getClass());
+                
+                // Atualiza o PendingIntent para usar FLAG_IMMUTABLE
                 PendingIntent mainPIntent = PendingIntent.getActivity(getApplicationContext(), 0,
-                        mainIntent, 33554432);
+                        mainIntent, PendingIntent.FLAG_IMMUTABLE);
+                
+                // Configura o Intent para abrir a atividade principal
                 mainIntent.setAction("android.intent.action.MAIN");
                 mainIntent.addCategory("android.intent.category.LAUNCHER");
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
+                // Envia o PendingIntent
                 mainPIntent.send();
 
             } else {
-                Intent intent = new Intent(this, BubbleService.currentActivity.getClass() );
+                // Caso a versão mínima não seja atendida, inicia a atividade de forma padrão
+                Intent intent = new Intent(this, BubbleService.currentActivity.getClass());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -613,15 +622,23 @@ public class BubbleService extends Service {
     };
 
     @Override
-    public int onStartCommand  (Intent intent, int flags, int startId) {
-        if(
-            (android.os.Build.VERSION.SDK_INT < 23) ||
-            (android.os.Build.VERSION.SDK_INT >= 23 && Settings.canDrawOverlays(getApplicationContext()))
-        ){
-            startForeground(
-                NOTIFICATION_ID,
-                prepareStartForeground(intent, flags, startId)
-            );
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if ((Build.VERSION.SDK_INT < 23) ||
+            (Build.VERSION.SDK_INT >= 23 && Settings.canDrawOverlays(getApplicationContext()))) {
+            
+            // Verifica se o Android é Q (10) ou superior para especificar o tipo de serviço em primeiro plano
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    NOTIFICATION_ID,
+                    prepareStartForeground(intent, flags, startId),
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MANIFEST  // Altere este tipo conforme necessário
+                );
+            } else {
+                startForeground(
+                    NOTIFICATION_ID,
+                    prepareStartForeground(intent, flags, startId)
+                );
+            }
         } else {
             prepareStart(intent, flags, startId);
         }
@@ -631,7 +648,6 @@ public class BubbleService extends Service {
         } else {
             return START_NOT_STICKY;
         }
-
     }
 
     @Override
